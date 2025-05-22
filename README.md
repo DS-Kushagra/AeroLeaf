@@ -2,8 +2,6 @@
 
 A blockchain-based platform to verify and trade carbon credits using satellite imagery and AI.
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
