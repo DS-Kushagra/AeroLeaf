@@ -97,7 +97,7 @@ The following improvements were recently implemented:
 
 8. **Animation Enhancement**: Integrated framer-motion for improved UI animations
 
-For more detailed troubleshooting information, see [TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md).
+For more detailed execution information, see [RUNNING.md](./RUNNING.md).
 
 ## 👥 Demo Accounts
 
