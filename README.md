@@ -6,17 +6,17 @@ A blockchain-based platform to verify and trade carbon credits using satellite i
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Quick Start Guide](#quick-start-guide)
-- [Project Structure](#project-structure)
-- [Recent Updates](#recent-updates)
-- [Demo Accounts](#demo-accounts)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Technology Stack](#-technology-stack)
+- [Quick Start Guide](#-quick-start-guide)
+- [Project Structure](#-project-structure)
+- [Recent Updates](#-recent-updates)
+- [Demo Accounts](#-demo-accounts)
+- [Documentation](#-documentation)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
 
 ## 🌍 Overview
 
@@ -40,7 +40,7 @@ Project AeroLeaf is a comprehensive platform designed to bring transparency and 
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/aeroleaf/carbon-credit-platform.git
+   git clone https://github.com/DS-Kushagra/Aeroleaf.git
    cd aeroleaf
    ```
 
@@ -231,7 +231,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions or support, please contact:
 
-- **Project Lead**: John Smith - john.smith@aeroleaf.com
-- **Technical Support**: support@aeroleaf.com
-- **Website**: [www.aeroleaf.com](https://www.aeroleaf.com)
-- **GitHub**: [github.com/aeroleaf](https://github.com/aeroleaf)
+- Kushagra - kushagraagrawal128@gmail.com
+- Moulik - moulikzinzala912@gmail.com
+- **Website**: [www.aeroleaf.com](Will be deployed soon)
+- **GitHub**: [github.com/aeroleaf](https://github.com/DS-Kushagra/AeroLeaf)
