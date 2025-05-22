@@ -3,7 +3,6 @@
 A blockchain-based platform to verify and trade carbon credits using satellite imagery and AI.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/aeroleaf/carbon-credit-platform)
 
 ## 📋 Table of Contents
 
