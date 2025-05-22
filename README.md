@@ -233,5 +233,5 @@ For questions or support, please contact:
 
 - Kushagra - kushagraagrawal128@gmail.com
 - Moulik - moulikzinzala912@gmail.com
-- **Website**: [www.aeroleaf.com](Will be deployed soon)
+- **Website**: [www.aeroleaf.com] (Will be deployed soon)
 - **GitHub**: [github.com/aeroleaf](https://github.com/DS-Kushagra/AeroLeaf)
