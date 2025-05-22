@@ -1,0 +1,18 @@
+{
+  "site_id": "site_003",
+  "location": {
+    "lat": -19.7548,
+    "lon": -42.5806
+  },
+  "planting_date": "2019-06-01",
+  "satellite_data": {
+    "pre_image": "RioDoce_2018_pre_NDVI.tif",
+    "post_image": "RioDoce_2020_post_NDVI.tif",
+    "ndvi_change": 0.0071
+  },
+  "verification_result": {
+    "status": "uncertain",
+    "confidence": 0.5,
+    "notes": "Positive NDVI change detected."
+  }
+}

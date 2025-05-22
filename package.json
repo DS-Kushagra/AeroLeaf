@@ -1,0 +1,19 @@
+{
+  "name": "aeroleaf",
+  "version": "1.0.0",
+  "description": "A blockchain-based platform to verify and trade carbon credits using satellite imagery and AI",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm-run-all --parallel start:*",
+    "start:backend": "cd backend && node app.js",
+    "start:frontend": "cd frontend/aeroleaf-frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend/aeroleaf-frontend && npm install && cd ../../blockchain && npm install",
+    "test:blockchain": "cd blockchain && npx hardhat test",
+    "process:ndvi": "python NDVI.py"
+  },
+  "dependencies": {
+    "firebase": "^11.8.0",
+    "concurrently": "^8.2.0",
+    "npm-run-all": "^4.1.5"
+  }
+}

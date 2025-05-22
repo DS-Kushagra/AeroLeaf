@@ -1,0 +1,18 @@
+{
+  "site_id": "site_002",
+  "location": {
+    "lat": -3.3624,
+    "lon": 38.3563
+  },
+  "planting_date": "2021-03-01",
+  "satellite_data": {
+    "pre_image": "TaitaHills_2020_pre_NDVI.tif",
+    "post_image": "TaitaHills_2022_post_NDVI.tif",
+    "ndvi_change": -0.3179
+  },
+  "verification_result": {
+    "status": "uncertain",
+    "confidence": 0.5,
+    "notes": "No significant NDVI gain."
+  }
+}
