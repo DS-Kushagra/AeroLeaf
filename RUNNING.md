@@ -78,8 +78,8 @@ Create or update `.env` files in both the root directory and the backend directo
 ```
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/aeroleaf
-FIREBASE_API_KEY=AIzaSyBz7OUQfrmpt0cVu7SL7ThTMvj4OaGAU64
-EARTH_ENGINE_API_KEY=ee-aeroleaf-project
+FIREBASE_API_KEY= YOUR FIREBASE API KEY
+EARTH_ENGINE_API_KEY= YOUR PROJECT(s) API KEY
 MAPBOX_TOKEN=pk.eyJ1IjoiYWVyb2xlYWYiLCJhIjoiY2xyMWttZGZxMGNkMjJqbnZ1NzJ2OTljbSJ9.FR74uazSLJM8FeH1fR8OSQ
 ```
 
