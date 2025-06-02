@@ -8,19 +8,27 @@ export default function MarketplaceCard({ listing }) {
   // Calculate time since listing
   const listingDate = listing.created_at
     ? new Date(
-        listing.created_at instanceof Object && listing.created_at.seconds
+        typeof listing.created_at === "object" && listing.created_at.seconds
           ? listing.created_at.seconds * 1000
           : listing.created_at
       )
     : new Date();
 
-  const timeAgo = formatDistanceToNow(listingDate, { addSuffix: true });
+  // Validate the date before using formatDistanceToNow
+  const timeAgo = !isNaN(listingDate.getTime())
+    ? formatDistanceToNow(listingDate, { addSuffix: true })
+    : "Recently";
 
   // Calculate time remaining for auctions
   const getAuctionTimeRemaining = () => {
     if (!listing.auction_end) return null;
 
     const endDate = new Date(listing.auction_end);
+
+    // Validate the date before using isPast and formatDistance
+    if (isNaN(endDate.getTime())) {
+      return "Auction time unknown";
+    }
 
     if (isPast(endDate)) {
       return "Auction ended";
