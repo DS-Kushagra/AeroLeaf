@@ -100,5 +100,3 @@ try {
   console.error("Failed to start server:", error);
   process.exit(1);
 }
-
-// This part has been moved up earlier in the file

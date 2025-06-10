@@ -1,0 +1,6 @@
+rasterio>=1.3.0
+numpy>=1.22.0
+earthengine-api>=0.1.341
+pandas>=1.5.0
+matplotlib>=3.6.0
+scipy>=1.9.0

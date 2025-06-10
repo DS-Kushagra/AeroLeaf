@@ -109,33 +109,4 @@ export default function ReviewSites() {
       )}
     </div>
   );
-  <div>
-    <h2>Sites Needing Manual Review</h2>
-    {flaggedSites.length === 0 ? (
-      <p>No sites currently need manual review.</p>
-    ) : (
-      flaggedSites.map((site) => (
-        <div key={site.id} className="bg-yellow-50 p-4 rounded-xl my-3 shadow">
-          <p>
-            <strong>Site:</strong> {site.name}
-          </p>
-          <p>
-            <strong>Flag:</strong> {site.flagged_issues?.join(", ")}
-          </p>
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-            onClick={() => markAsVerified(site.id)}
-          >
-            Mark as Verified
-          </button>
-          <button
-            className="bg-orange-500 text-white px-4 py-2 rounded"
-            onClick={() => escalateToDispute(site.id)}
-          >
-            Escalate
-          </button>
-        </div>
-      ))
-    )}
-  </div>;
 }

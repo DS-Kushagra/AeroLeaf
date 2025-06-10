@@ -31,8 +31,8 @@ print(f"ΔNDVI: {delta_ndvi}")
 result = {
     "site_id": "site_003",
     "location": {
-        "lat": -19.7548,
-        "lon": -42.5806
+        "lat": -19.5236,
+        "lon": -42.6394
     },
     "planting_date": "2019-06-01",
     "satellite_data": {

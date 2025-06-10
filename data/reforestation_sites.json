@@ -2,8 +2,8 @@
   {
     "site_id": "site_001",
     "location": {
-      "lat": 21.3674,
-      "lon": 74.2414
+      "lat": 21.3758,
+      "lon": 74.2417
     },
     "planting_date": "2020-06-01",
     "region": "Nandurbar, Maharashtra, India"
@@ -11,8 +11,8 @@
   {
     "site_id": "site_002",
     "location": {
-      "lat": -3.3624,
-      "lon": 38.3563
+      "lat": -3.3999,
+      "lon": 38.3591
     },
     "planting_date": "2021-04-15",
     "region": "Taita Hills, Kenya"
@@ -20,8 +20,8 @@
   {
     "site_id": "site_003",
     "location": {
-      "lat": -19.7548,
-      "lon": -42.5806
+      "lat": -19.5236,
+      "lon": -42.6394
     },
     "planting_date": "2019-05-10",
     "region": "Rio Doce Park, Brazil"
