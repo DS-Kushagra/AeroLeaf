@@ -32,8 +32,13 @@ import RetireCredit from "../components/RetireCredit";
 import SatelliteComparison from "../components/SatelliteComparison";
 import NDVIChart from "../components/NDVIChart";
 import { creditsApi } from "../services/api";
+import { useHelp } from "../contexts/HelpContext";
+import InfoCard from "../components/InfoCard";
+import { HelpTooltip } from "../components/Tooltip";
+import { School as SchoolIcon } from "@mui/icons-material";
 
 export default function Dashboard() {
+  const { startGuidedTour } = useHelp();
   const [monthOffset, setMonthOffset] = useState(0);
   const [userCredits, setUserCredits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -186,6 +191,7 @@ export default function Dashboard() {
               className="font-bold mb-1 text-gray-800"
             >
               Dashboard
+              <HelpTooltip title="This is your main dashboard where you can monitor your carbon credits and explore reforestation sites" />
             </Typography>
             <Typography variant="body1" color="textSecondary">
               Welcome back! Here's an overview of your carbon credit portfolio.
@@ -196,12 +202,33 @@ export default function Dashboard() {
               component={Link}
               to="/marketplace"
               variant="contained"
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-md hover:shadow-lg transition-all"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-md hover:shadow-lg transition-all mr-2"
             >
               Explore Marketplace
             </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<SchoolIcon />}
+              onClick={startGuidedTour}
+            >
+              Take a Tour
+            </Button>
           </div>
         </div>
+        
+        <InfoCard
+          title="Getting Started with AeroLeaf"
+          id="dashboard-welcome"
+          defaultExpanded={true}
+        >
+          <Typography variant="body1" paragraph>
+            Welcome to your AeroLeaf dashboard! Here you can monitor your carbon credits, explore reforestation sites, and track your environmental impact.
+          </Typography>
+          <Typography variant="body1">
+            Use the interactive map below to explore reforestation sites. Click on a marker to view basic information about the site and access detailed analytics.
+          </Typography>
+        </InfoCard>
 
         {/* Quick Stats Cards */}
         <Grid container spacing={3} className="mb-8 fade-in">
@@ -328,6 +355,7 @@ export default function Dashboard() {
               className="font-semibold text-gray-800"
             >
               Reforestation Sites
+              <HelpTooltip title="Explore reforestation sites on the map or in list view. Use the time slider to see how sites have changed over time." />
             </Typography>
             <div className="flex space-x-2">
               <Button
@@ -427,6 +455,7 @@ export default function Dashboard() {
               className="font-semibold text-gray-800"
             >
               Your Carbon Credits
+              <HelpTooltip title="This section shows your carbon credit portfolio with details about each credit's status and verification" />
             </Typography>
             <Button
               component={Link}
@@ -664,6 +693,7 @@ export default function Dashboard() {
             className="font-semibold mb-6 text-gray-800"
           >
             Analytics
+            <HelpTooltip title="View analytics about your carbon offset impact and verification status of your credits" />
           </Typography>
           <Grid container spacing={4}>
             <Grid
@@ -707,6 +737,7 @@ export default function Dashboard() {
             className="font-semibold mb-6 text-gray-800"
           >
             Account Management
+            <HelpTooltip title="Manage your user profile and application settings" />
           </Typography>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
@@ -731,6 +762,24 @@ export default function Dashboard() {
             </Grid>
           </Grid>
         </Box>
+
+        <Grid item xs={12}>
+          <InfoCard
+            title="Understanding Carbon Credits"
+            id="dashboard-carbon-credits-info"
+            defaultExpanded={false}
+          >
+            <Typography variant="body1" paragraph>
+              Carbon credits represent one ton of carbon dioxide (CO₂) that has been sequestered (removed) from the atmosphere through reforestation or other carbon capture projects.
+            </Typography>
+            <Typography variant="body1" paragraph>
+              Each credit in your portfolio has been verified through satellite imagery analysis and blockchain technology, ensuring transparency and reliability.
+            </Typography>
+            <Typography variant="body1">
+              You can trade these credits in the Marketplace or retire them to offset your carbon footprint, permanently removing them from circulation.
+            </Typography>
+          </InfoCard>
+        </Grid>
 
         {/* Mobile view marketplace button */}
         <Box className="fixed bottom-6 right-6 md:hidden">
