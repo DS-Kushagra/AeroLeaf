@@ -21,6 +21,7 @@ import {
   ShowChart,
   PieChart,
   TrendingUp,
+  School as SchoolIcon,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import MapView from "../components/MapView";
@@ -33,12 +34,13 @@ import SatelliteComparison from "../components/SatelliteComparison";
 import NDVIChart from "../components/NDVIChart";
 import { creditsApi } from "../services/api";
 import { useHelp } from "../contexts/HelpContext";
+import { useAuth } from "../contexts/AuthContext";
 import InfoCard from "../components/InfoCard";
 import { HelpTooltip } from "../components/Tooltip";
-import { School as SchoolIcon } from "@mui/icons-material";
 
 export default function Dashboard() {
   const { startGuidedTour } = useHelp();
+  const { currentUser, loading: authLoading } = useAuth();
   const [monthOffset, setMonthOffset] = useState(0);
   const [userCredits, setUserCredits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,76 +102,82 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    // In a real application, this would fetch the user's credits
-    // from the backend with proper authentication
-    async function fetchUserCredits() {
-      try {
-        setLoading(true);
-
-        // This endpoint would need to be implemented
-        // const data = await creditsApi.getUserCredits();
-        // setUserCredits(data);
-
-        // Mock data for demo
-        setTimeout(() => {
-          setUserCredits([
-            {
-              id: "cc_001",
-              token_id: "CC001",
-              project_id: "site_001",
-              project_name: "Nandurbar Reforestation",
-              amount: 15.5,
-              status: "verified",
-              vintage: "2023",
-              acquired_date: "2024-02-15",
-              location: "Maharashtra, India",
-              image:
-                "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80",
-              co2_equivalent: 15.5,
-            },
-            {
-              id: "cc_002",
-              token_id: "CC002",
-              project_id: "site_003",
-              project_name: "Taita Hills Conservation",
-              amount: 22.3,
-              status: "pending",
-              vintage: "2024",
-              acquired_date: "2025-01-10",
-              location: "Kenya",
-              image:
-                "https://images.unsplash.com/photo-1504567961542-e24d9439a724?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80",
-              co2_equivalent: 22.3,
-            },
-            {
-              id: "cc_003",
-              token_id: "CC003",
-              project_id: "site_002",
-              project_name: "Amazon Reforestation",
-              amount: 10.2,
-              status: "retired",
-              vintage: "2023",
-              acquired_date: "2024-03-20",
-              retired_date: "2024-12-15",
-              retired_reason: "Annual Carbon Offset Program",
-              location: "Brazil",
-              image:
-                "https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80",
-              co2_equivalent: 10.2,
-            },
-          ]);
-          setLoading(false);
-          setError(null);
-        }, 1200);
-      } catch (err) {
-        console.error("Failed to fetch user's carbon credits:", err);
-        setError("Could not load your carbon credits. Please try again later.");
-        setLoading(false);
-      }
+    // Only fetch user data when authenticated
+    if (currentUser && !authLoading) {
+      fetchUserCredits();
+    } else if (!authLoading && !currentUser) {
+      // User not authenticated, clear data
+      setUserCredits([]);
+      setLoading(false);
     }
+  }, [currentUser, authLoading]);
 
-    fetchUserCredits();
-  }, []);
+  // Fetch user's carbon credits from the backend (currently using mock data)
+  async function fetchUserCredits() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // TODO: Replace with real API call when backend is ready
+      // const data = await creditsApi.getUserCredits();
+      // setUserCredits(data);
+
+      // Mock data for demonstration - will be replaced with API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setUserCredits([
+        {
+          id: "cc_001",
+          token_id: "CC001",
+          project_id: "site_001",
+          project_name: "Nandurbar Reforestation",
+          amount: 15.5,
+          status: "verified",
+          vintage: "2023",
+          acquired_date: "2024-02-15",
+          location: "Maharashtra, India",
+          image:
+            "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80",
+          co2_equivalent: 15.5,
+        },
+        {
+          id: "cc_002",
+          token_id: "CC002",
+          project_id: "site_003",
+          project_name: "Taita Hills Conservation",
+          amount: 22.3,
+          status: "pending",
+          vintage: "2024",
+          acquired_date: "2025-01-10",
+          location: "Kenya",
+          image:
+            "https://images.unsplash.com/photo-1504567961542-e24d9439a724?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80",
+          co2_equivalent: 22.3,
+        },
+        {
+          id: "cc_003",
+          token_id: "CC003",
+          project_id: "site_002",
+          project_name: "Amazon Reforestation",
+          amount: 10.2,
+          status: "retired",
+          vintage: "2023",
+          acquired_date: "2024-03-20",
+          retired_date: "2024-12-15",
+          retired_reason: "Annual Carbon Offset Program",
+          location: "Brazil",
+          image:
+            "https://images.unsplash.com/photo-1511497584788-876760111969?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80",
+          co2_equivalent: 10.2,
+        },
+      ]);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch user's carbon credits:", err);
+      setError("Could not load your carbon credits. Please try again later.");
+      setLoading(false);
+    }
+  }
 
   const timeLabels = [
     "24 months ago",
@@ -178,6 +186,48 @@ export default function Dashboard() {
     "6 months ago",
     "Current",
   ];
+
+  // Show loading spinner while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <CircularProgress size={60} color="primary" />
+          <Typography variant="h6" className="mt-4 text-gray-600">
+            Loading your dashboard...
+          </Typography>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message for unauthenticated users
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+        <Container maxWidth="sm" className="text-center">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <Typography variant="h4" className="mb-4 text-gray-800">
+              Welcome to AeroLeaf
+            </Typography>
+            <Typography variant="body1" className="mb-6 text-gray-600">
+              Please sign in to access your carbon credit dashboard and manage
+              your portfolio.
+            </Typography>
+            <Button
+              component={Link}
+              to="/login"
+              variant="contained"
+              size="large"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Sign In
+            </Button>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-12">
@@ -216,17 +266,21 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
-        
+
         <InfoCard
           title="Getting Started with AeroLeaf"
           id="dashboard-welcome"
           defaultExpanded={true}
         >
           <Typography variant="body1" paragraph>
-            Welcome to your AeroLeaf dashboard! Here you can monitor your carbon credits, explore reforestation sites, and track your environmental impact.
+            Welcome to your AeroLeaf dashboard! Here you can monitor your carbon
+            credits, explore reforestation sites, and track your environmental
+            impact.
           </Typography>
           <Typography variant="body1">
-            Use the interactive map below to explore reforestation sites. Click on a marker to view basic information about the site and access detailed analytics.
+            Use the interactive map below to explore reforestation sites. Click
+            on a marker to view basic information about the site and access
+            detailed analytics.
           </Typography>
         </InfoCard>
 
@@ -770,13 +824,19 @@ export default function Dashboard() {
             defaultExpanded={false}
           >
             <Typography variant="body1" paragraph>
-              Carbon credits represent one ton of carbon dioxide (CO₂) that has been sequestered (removed) from the atmosphere through reforestation or other carbon capture projects.
+              Carbon credits represent one ton of carbon dioxide (CO₂) that has
+              been sequestered (removed) from the atmosphere through
+              reforestation or other carbon capture projects.
             </Typography>
             <Typography variant="body1" paragraph>
-              Each credit in your portfolio has been verified through satellite imagery analysis and blockchain technology, ensuring transparency and reliability.
+              Each credit in your portfolio has been verified through satellite
+              imagery analysis and blockchain technology, ensuring transparency
+              and reliability.
             </Typography>
             <Typography variant="body1">
-              You can trade these credits in the Marketplace or retire them to offset your carbon footprint, permanently removing them from circulation.
+              You can trade these credits in the Marketplace or retire them to
+              offset your carbon footprint, permanently removing them from
+              circulation.
             </Typography>
           </InfoCard>
         </Grid>
