@@ -1,113 +1,273 @@
 /**
- * API Service for AeroLeaf Frontend
- * This file provides a centralized way to make API requests to the backend
+ * Production-ready API Service for AeroLeaf Frontend
+ * Handles all API communications with proper error handling and token management
  */
+import authService from "./firebase";
 
-// Using relative path for API requests, which will be proxied by Vite during development
-const API_BASE_URL = "/api";
+class ApiService {
+  constructor() {
+    this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    this.timeout = 30000; // 30 seconds
+  }
 
-/**
- * Generic API request handler with error handling
- * @param {string} endpoint - API endpoint to call
- * @param {Object} options - Fetch options
- * @returns {Promise<any>} Response data
- */
-async function apiRequest(endpoint, options = {}) {
-  try {
-    const url = `${API_BASE_URL}${endpoint}`;
+  /**
+   * Make authenticated API request
+   * @param {string} endpoint - API endpoint
+   * @param {Object} options - Request options
+   * @returns {Promise<any>} Response data
+   */
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+
+    // Get authentication token
+    const token = await authService.getCurrentToken();
+
     // Default headers
     const headers = {
       "Content-Type": "application/json",
       ...options.headers,
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    // Add authentication header if token exists
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
-    if (!response.ok) {
-      // Try to get error message from response
-      let errorMessage;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || `HTTP error ${response.status}`;
-      } catch (e) {
-        errorMessage = `HTTP error ${response.status}`;
+    // Request configuration
+    const config = {
+      method: "GET",
+      headers,
+      ...options,
+    };
+
+    // Add timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    config.signal = controller.signal;
+
+    try {
+      const response = await fetch(url, config);
+      clearTimeout(timeoutId);
+
+      // Handle different response types
+      if (!response.ok) {
+        await this.handleErrorResponse(response);
       }
 
-      throw new Error(errorMessage);
+      // Parse response based on content type
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return await response.json();
+      }
+
+      return await response.text();
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error.name === "AbortError") {
+        throw new Error("Request timeout");
+      }
+
+      throw this.handleRequestError(error);
+    }
+  }
+
+  /**
+   * Handle error responses
+   * @param {Response} response - Fetch response object
+   */
+  async handleErrorResponse(response) {
+    let errorData;
+
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { message: "Unknown error occurred" };
     }
 
-    // For 204 No Content responses
-    if (response.status === 204) {
-      return null;
+    // Handle authentication errors
+    if (response.status === 401) {
+      // Token might be expired, try to refresh
+      try {
+        const newToken = await authService.getCurrentToken(true);
+        if (!newToken) {
+          // Redirect to login
+          window.location.href = "/login";
+          throw new Error("Authentication required");
+        }
+      } catch {
+        window.location.href = "/login";
+        throw new Error("Authentication required");
+      }
     }
 
-    return await response.json();
-  } catch (error) {
-    console.error("API request failed:", error);
+    const error = new Error(errorData.message || `HTTP ${response.status}`);
+    error.status = response.status;
+    error.code = errorData.code;
+    error.details = errorData.details;
+
     throw error;
+  }
+
+  /**
+   * Handle request errors
+   * @param {Error} error - Request error
+   * @returns {Error} Formatted error
+   */
+  handleRequestError(error) {
+    if (error.message === "Failed to fetch") {
+      return new Error("Network error. Please check your connection.");
+    }
+
+    return error;
+  }
+
+  // Legacy method for backward compatibility
+  async apiRequest(endpoint, options = {}) {
+    return this.request(endpoint, options);
+  }
+
+  // Authentication endpoints
+  async register(userData) {
+    return this.request("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async getProfile() {
+    return this.request("/api/auth/profile");
+  }
+
+  async updateProfile(userData) {
+    return this.request("/api/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async deleteAccount() {
+    return this.request("/api/auth/delete-account", {
+      method: "DELETE",
+    });
+  }
+
+  // Carbon credits endpoints
+  async getCarbonCredits() {
+    return this.request("/api/credits/user-credits");
+  }
+
+  async getCreditDetails(creditId) {
+    return this.request(`/api/credits/${creditId}`);
+  }
+
+  async mintCredit(creditData) {
+    return this.request("/api/credits/mint", {
+      method: "POST",
+      body: JSON.stringify(creditData),
+    });
+  }
+
+  async transferCredit(creditId, transferData) {
+    return this.request(`/api/credits/${creditId}/transfer`, {
+      method: "POST",
+      body: JSON.stringify(transferData),
+    });
+  }
+
+  async retireCredit(creditId) {
+    return this.request(`/api/credits/${creditId}/retire`, {
+      method: "POST",
+    });
+  }
+
+  // Marketplace endpoints (legacy compatibility)
+  async getMarketplaceBids() {
+    return this.request("/api/marketplace/bids");
+  }
+
+  async getMarketplaceListings() {
+    return this.request("/api/marketplace/listings");
+  }
+
+  async createListing(listingData) {
+    return this.request("/api/marketplace/list", {
+      method: "POST",
+      body: JSON.stringify(listingData),
+    });
+  }
+
+  async placeBid(listingId, bidData) {
+    return this.request(`/api/marketplace/listings/${listingId}/bid`, {
+      method: "POST",
+      body: JSON.stringify(bidData),
+    });
+  }
+
+  async buyCredit(creditId) {
+    return this.request("/api/credits/buy", {
+      method: "POST",
+      body: JSON.stringify({ creditId }),
+    });
+  }
+
+  // Site verification endpoints
+  async getSites() {
+    return this.request("/api/sites");
+  }
+
+  async getSiteDetails(siteId) {
+    return this.request(`/api/sites/${siteId}`);
+  }
+
+  async submitVerification(siteId, verificationData) {
+    return this.request(`/api/sites/${siteId}/verify`, {
+      method: "POST",
+      body: JSON.stringify(verificationData),
+    });
+  }
+
+  // Health check
+  async healthCheck() {
+    return this.request("/health");
+  }
+
+  // Legacy exports for existing code
+  async getCarbonCreditsBid() {
+    return this.getMarketplaceBids();
+  }
+
+  async getSiteVerification(siteId) {
+    return this.getSiteDetails(siteId);
   }
 }
 
-// Sites API
-export const sitesApi = {
-  getSites: () => apiRequest("/sites"),
-  getSiteById: (id) => apiRequest(`/sites/${id}`),
-  getSitesForReview: () => apiRequest("/sites?manual_review_required=true"),
-  verifySite: (id) => apiRequest(`/sites/${id}/verify`, { method: "POST" }),
-  reportSite: (siteData) =>
-    apiRequest("/report", {
-      method: "POST",
-      body: JSON.stringify(siteData),
-    }),
-};
+// Create singleton instance
+const apiService = new ApiService();
 
-// Credits API
+// Backward compatibility exports
 export const creditsApi = {
-  getListings: () => apiRequest("/marketplace/listings"),
-  buyCredit: (listingId) =>
-    apiRequest("/marketplace/buy", {
-      method: "POST",
-      body: JSON.stringify({ listingId }),
-    }),
-  listCredit: (creditData) =>
-    apiRequest("/marketplace/list", {
-      method: "POST",
-      body: JSON.stringify(creditData),
-    }),
+  getUserCredits: () => apiService.getCarbonCredits(),
+  getListings: () => apiService.getMarketplaceListings(),
   placeBid: (listingId, bidAmount) =>
-    apiRequest("/marketplace/bid", {
-      method: "POST",
-      body: JSON.stringify({ listingId, bidAmount }),
-    }),
-  getUserCredits: () => apiRequest("/credits/user-credits"),
-  getCreditById: (id) => apiRequest(`/credits/${id}`),
-  mintCredit: (creditData) =>
-    apiRequest("/credits/mint", {
-      method: "POST",
-      body: JSON.stringify(creditData),
-    }),
-  transferCredit: (creditId, receiverUid) =>
-    apiRequest("/credits/transfer", {
-      method: "POST",
-      body: JSON.stringify({ creditId, receiverUid }),
-    }),
-  retireCredit: (creditId) =>
-    apiRequest(`/credits/${creditId}/retire`, {
-      method: "POST",
-    }),
+    apiService.placeBid(listingId, { amount: bidAmount }),
+  retireCredit: (creditId) => apiService.retireCredit(creditId),
+  listCredit: (listingData) => apiService.createListing(listingData),
+  buyCredit: (creditId) => apiService.buyCredit(creditId),
+  mintCredit: (creditData) => apiService.mintCredit(creditData),
+  transferCredit: (creditId, transferData) =>
+    apiService.transferCredit(creditId, transferData),
 };
 
-// Reports API
-export const reportsApi = {
-  getReports: () => apiRequest("/reports"),
+export const sitesApi = {
+  getSitesForReview: () => apiService.getSites(),
+  getSiteById: (siteId) => apiService.getSiteDetails(siteId),
+  verifySite: (siteId) =>
+    apiService.submitVerification(siteId, { verified: true }),
+  escalateSite: (siteId) =>
+    apiService.submitVerification(siteId, { escalated: true }),
 };
 
-// Export a default API object with all the API namespaces
-export default {
-  sites: sitesApi,
-  credits: creditsApi,
-  reports: reportsApi,
-};
+// Export both the class and instance for backward compatibility
+export { ApiService };
+export default apiService;
