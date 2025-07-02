@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const admin = require("firebase-admin");
-const { getFirestore } = require("firebase-admin/firestore");
-const authMiddleware = require("../middleware/auth.middleware");
+const { getFirestore } = require("../config/firebase");
+const {
+  authMiddleware,
+  requireRole,
+} = require("../middleware/auth.middleware");
+const { validateInput } = require("../config/security");
+const logger = require("../config/logger");
 
 // Get user's carbon credits
 router.get("/user-credits", authMiddleware, async (req, res) => {
@@ -24,9 +28,17 @@ router.get("/user-credits", authMiddleware, async (req, res) => {
       });
     });
 
+    logger.info("User credits retrieved", {
+      userId: uid,
+      creditCount: credits.length,
+    });
+
     res.status(200).json(credits);
   } catch (error) {
-    console.error("Error fetching user credits:", error);
+    logger.error("Error fetching user credits:", {
+      userId: req.user.uid,
+      error: error.message,
+    });
     res.status(500).json({ error: "Failed to fetch user credits" });
   }
 });
@@ -54,51 +66,69 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 // Mint new carbon credit (would connect to blockchain in production)
-router.post("/mint", authMiddleware, async (req, res) => {
-  try {
-    const { siteId, amount, vintage } = req.body;
-    const ownerUid = req.user.uid;
+router.post(
+  "/mint",
+  authMiddleware,
+  requireRole(["landowner", "verifier"]),
+  validateInput.validateBody({
+    siteId: { required: true, type: "string" },
+    amount: { required: true, type: "string" },
+    vintage: { required: true, type: "string" },
+  }),
+  async (req, res) => {
+    try {
+      const { siteId, amount, vintage } = req.body;
+      const ownerUid = req.user.uid;
 
-    if (!siteId || !amount || !vintage) {
-      return res.status(400).json({ error: "Missing required fields" });
+      const db = getFirestore();
+      const { admin } = require("../config/firebase");
+
+      // Check if site exists
+      const siteDoc = await db.collection("sites").doc(siteId).get();
+
+      if (!siteDoc.exists) {
+        return res.status(404).json({ error: "Site not found" });
+      }
+
+      // In production, this would call the blockchain to mint the token
+      // and store transaction details
+
+      // For now, just create a record in Firestore
+      const creditRef = db.collection("carbon_credits").doc();
+      await creditRef.set({
+        token_id: `CC${Math.floor(Math.random() * 10000)
+          .toString()
+          .padStart(4, "0")}`,
+        site_id: siteId,
+        amount: parseFloat(amount),
+        vintage: vintage,
+        status: "pending",
+        owner_uid: ownerUid,
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      logger.info("Carbon credit minted", {
+        creditId: creditRef.id,
+        siteId,
+        amount,
+        ownerUid,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Carbon credit minted successfully",
+        creditId: creditRef.id,
+      });
+    } catch (error) {
+      logger.error("Error minting carbon credit:", {
+        userId: req.user.uid,
+        siteId: req.body.siteId,
+        error: error.message,
+      });
+      res.status(500).json({ error: "Failed to mint carbon credit" });
     }
-
-    const db = getFirestore();
-
-    // Check if site exists
-    const siteDoc = await db.collection("sites").doc(siteId).get();
-
-    if (!siteDoc.exists) {
-      return res.status(404).json({ error: "Site not found" });
-    }
-
-    // In production, this would call the blockchain to mint the token
-    // and store transaction details
-
-    // For now, just create a record in Firestore
-    const creditRef = db.collection("carbon_credits").doc();
-    await creditRef.set({
-      token_id: `CC${Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, "0")}`,
-      site_id: siteId,
-      amount: parseFloat(amount),
-      vintage: vintage,
-      status: "pending",
-      owner_uid: ownerUid,
-      created_at: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    res.status(201).json({
-      success: true,
-      id: creditRef.id,
-      message: "Carbon credit minted successfully",
-    });
-  } catch (error) {
-    console.error("Error minting carbon credit:", error);
-    res.status(500).json({ error: "Failed to mint carbon credit" });
   }
-});
+);
 
 // Transfer credit ownership
 router.post("/transfer", authMiddleware, async (req, res) => {
