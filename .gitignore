@@ -131,6 +131,8 @@ celerybeat.pid
 .Artifacts/
 .env
 .env.example
+.env.development
+.env.production
 .venv
 env/
 venv/
