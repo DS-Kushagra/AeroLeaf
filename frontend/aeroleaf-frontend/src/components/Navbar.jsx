@@ -1,22 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import WalletConnect from "./WalletConnect";
 
 export default function Navbar() {
-  const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
   const userMenuRef = useRef(null);
   const location = useLocation();
 
-  useEffect(() => {
-    // Check if user is logged in
-    const loggedInUser = localStorage.getItem("user");
-    if (loggedInUser) {
-      setUser(JSON.parse(loggedInUser));
-    }
-  }, []);
+  // Use AuthContext instead of localStorage
+  const { currentUser, signOut, loading } = useAuth();
 
   useEffect(() => {
     // Close dropdown when clicking outside
@@ -37,10 +32,13 @@ export default function Navbar() {
     setUserMenuOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
   // Check if a link is active
   const isActive = (path) => {
@@ -131,7 +129,12 @@ export default function Navbar() {
               Report
             </Link>
 
-            {user ? (
+            {loading ? (
+              // Show loading spinner while auth state is being determined
+              <div className="flex items-center space-x-2 ml-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : currentUser ? (
               <>
                 <div className="relative" ref={userMenuRef}>
                   <button
@@ -141,9 +144,13 @@ export default function Navbar() {
                     aria-haspopup="true"
                   >
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-800 font-semibold">
-                      {user.displayName.charAt(0).toUpperCase()}
+                      {(currentUser.displayName || currentUser.email)
+                        .charAt(0)
+                        .toUpperCase()}
                     </div>
-                    <span className="hidden sm:inline">{user.displayName}</span>
+                    <span className="hidden sm:inline">
+                      {currentUser.displayName || "User"}
+                    </span>
                     <svg
                       className={`h-5 w-5 transition-transform duration-200 ${
                         userMenuOpen ? "transform rotate-180" : ""
@@ -166,7 +173,7 @@ export default function Navbar() {
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-sm text-gray-500">Signed in as</p>
                         <p className="text-sm font-medium text-gray-900 truncate">
-                          {user.email}
+                          {currentUser.email}
                         </p>
                       </div>
                       <Link
@@ -234,9 +241,11 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
-            {user && (
+            {currentUser && (
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-800 font-semibold mr-2">
-                {user.displayName.charAt(0).toUpperCase()}
+                {(currentUser.displayName || currentUser.email)
+                  .charAt(0)
+                  .toUpperCase()}
               </div>
             )}
             <button
@@ -421,7 +430,12 @@ export default function Navbar() {
           </Link>
 
           <div className="pt-2 border-t border-gray-200">
-            {user ? (
+            {loading ? (
+              // Show loading in mobile menu
+              <div className="flex items-center justify-center px-3 py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+              </div>
+            ) : currentUser ? (
               <>
                 <div className="flex items-center px-3 py-2 text-sm text-gray-500">
                   <svg
@@ -439,7 +453,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span className="text-gray-900 font-medium">
-                    {user.displayName}
+                    {currentUser.displayName || "User"}
                   </span>
                 </div>
                 <WalletConnect />
