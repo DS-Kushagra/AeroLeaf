@@ -14,39 +14,42 @@ import Login from "./pages/Login";
 import SiteDetails from "./pages/SiteDetails";
 import ReviewSites from "./pages/ReviewSites";
 import { HelpProvider } from "./contexts/HelpContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import HelpButton from "./components/HelpButton";
 import { Web3Provider } from "./contexts/Web3Context";
 import "./App.css";
 
 function App() {
   return (
-    <Web3Provider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HelpProvider>
-          <Router>
-            <div className="flex flex-col min-h-screen">
-              <StatusBanner />
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/report" element={<Report />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/site/:id" element={<SiteDetails />} />
-                  <Route path="/review" element={<ReviewSites />} />
-                </Routes>
-              </main>
-              <Footer />
-              <HelpButton />
-            </div>
-          </Router>
-        </HelpProvider>
-      </ThemeProvider>
-    </Web3Provider>
+    <AuthProvider>
+      <Web3Provider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <HelpProvider>
+            <Router>
+              <div className="flex flex-col min-h-screen">
+                <StatusBanner />
+                <Navbar />
+                <main className="flex-grow">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/report" element={<Report />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/site/:id" element={<SiteDetails />} />
+                    <Route path="/review" element={<ReviewSites />} />
+                  </Routes>
+                </main>
+                <Footer />
+                <HelpButton />
+              </div>
+            </Router>
+          </HelpProvider>
+        </ThemeProvider>
+      </Web3Provider>
+    </AuthProvider>
   );
 }
 
