@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,11 +12,20 @@ export default function Login() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
+  const { signIn, signUp, resetPassword, clearError, currentUser } = useAuth();
 
   // Animation and transition effect
   const [animate, setAnimate] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/dashboard");
+    }
+  }, [currentUser, navigate]);
 
   useEffect(() => {
     setAnimate(true);
@@ -30,11 +40,12 @@ export default function Login() {
     setAnimate(false);
     setError("");
     setSuccess("");
+    clearError();
 
     setTimeout(() => {
       setIsLogin(!isLogin);
       setAnimate(true);
-    }, 300); // Slightly longer for smoother transition
+    }, 300);
   };
 
   const handleSubmit = async (e) => {
@@ -42,9 +53,10 @@ export default function Login() {
     setError("");
     setSuccess("");
     setLoading(true);
+    clearError();
 
     try {
-      // Validate form
+      // Client-side validation
       if (!email || !password) {
         setError("All fields are required");
         setLoading(false);
@@ -57,70 +69,77 @@ export default function Login() {
         return;
       }
 
-      // In production, this would use Firebase Authentication
-      // For demo purposes, we'll simulate a successful login
-      setTimeout(() => {
-        // Hardcoded test users
-        const testUsers = {
-          "alice@example.com": { password: "password123", role: "investor" },
-          "bob@example.com": { password: "password123", role: "landowner" },
-          "charlie@example.com": { password: "password123", role: "verifier" },
-        };
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        setLoading(false);
+        return;
+      }
 
-        if (isLogin) {
-          // Handle login
-          const user = testUsers[email];
-          if (user && user.password === password) {
-            // Show success message briefly before redirecting
-            setSuccess("Login successful! Redirecting to dashboard...");
-
-            // Store user in local storage
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                email,
-                role: user.role,
-                uid: email.split("@")[0],
-                displayName:
-                  email.split("@")[0].charAt(0).toUpperCase() +
-                  email.split("@")[0].slice(1),
-              })
-            );
-
-            setTimeout(() => {
-              navigate("/dashboard");
-            }, 1000);
-          } else {
-            setError("Invalid email or password");
-          }
-        } else {
-          // Handle signup (just simulate success for demo)
-          setSuccess("Account created successfully! You can now log in.");
-          setTimeout(() => {
-            setIsLogin(true);
-            setEmail("");
-            setPassword("");
-            setName("");
-          }, 1500);
-
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              email,
-              role,
-              uid: email.split("@")[0],
-              displayName:
-                name ||
-                email.split("@")[0].charAt(0).toUpperCase() +
-                  email.split("@")[0].slice(1),
-            })
-          );
+      // Password validation for signup
+      if (!isLogin) {
+        if (password.length < 8) {
+          setError("Password must be at least 8 characters long");
+          setLoading(false);
+          return;
         }
 
-        setLoading(false);
-      }, 1000);
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+        if (!passwordRegex.test(password)) {
+          setError(
+            "Password must contain uppercase, lowercase, number and special character"
+          );
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (isLogin) {
+        // Handle login with Firebase
+        const result = await signIn(email, password, rememberMe);
+        setSuccess("Login successful! Redirecting to dashboard...");
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        // Handle signup with Firebase
+        await signUp(email, password, name, role);
+        setSuccess(
+          "Account created successfully! Please check your email for verification."
+        );
+
+        setTimeout(() => {
+          setIsLogin(true);
+          setEmail("");
+          setPassword("");
+          setName("");
+        }, 2000);
+      }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      console.error("Authentication error:", error);
+      setError(error.message || "An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address first");
+      return;
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+      await resetPassword(email);
+      setSuccess("Password reset email sent! Check your inbox.");
+    } catch (error) {
+      setError(error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -590,7 +609,7 @@ export default function Login() {
                   </div>
                 </div>
               )}
-            </div>
+            </div>{" "}
             {isLogin && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -598,6 +617,8 @@ export default function Login() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded transition-colors"
                   />
                   <label
@@ -609,12 +630,14 @@ export default function Login() {
                 </div>
 
                 <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-medium text-green-600 hover:text-green-500 hover:underline transition-colors"
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={loading}
+                    className="font-medium text-green-600 hover:text-green-500 hover:underline transition-colors disabled:opacity-50"
                   >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
               </div>
             )}{" "}
@@ -651,21 +674,11 @@ export default function Login() {
             </div>
             <div className="text-center text-sm mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
               <p className="text-gray-600 font-medium mb-1">
-                For demo purposes, use:
+                For demo purposes, you can:
               </p>
               <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-6 text-gray-500">
-                <p>
-                  Email:{" "}
-                  <span className="font-mono bg-gray-100 px-1 rounded">
-                    alice@example.com
-                  </span>
-                </p>
-                <p>
-                  Password:{" "}
-                  <span className="font-mono bg-gray-100 px-1 rounded">
-                    password123
-                  </span>
-                </p>
+                <p>• Create a new account with any email</p>
+                <p>• Use real Firebase authentication</p>
               </div>
             </div>
           </form>
