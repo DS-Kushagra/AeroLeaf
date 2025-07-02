@@ -61,9 +61,11 @@ import { creditsApi } from "../services/api";
 import PlaceBid from "../components/PlaceBid";
 import { addEventListener, removeEventListener } from "../services/socket";
 import { useWeb3 } from "../contexts/Web3Context";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Marketplace() {
   const { account } = useWeb3();
+  const { currentUser, loading: authLoading } = useAuth();
   const [listings, setListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1011,537 +1013,593 @@ export default function Marketplace() {
 
   return (
     <Container maxWidth="xl" className="py-8">
-      {/* Enhanced Hero Section with Live Market Data */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Box className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white shadow-2xl relative overflow-hidden">
-          {/* Background Pattern */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              width: "300px",
-              height: "300px",
-              background:
-                "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
-              borderRadius: "50%",
-            }}
-          />
-
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={8}>
-              <Typography
-                variant="h3"
-                component="h1"
-                gutterBottom
-                className="font-bold"
-                sx={{ fontSize: { xs: "2rem", md: "3rem" } }}
-              >
-                🌍 Carbon Credit Marketplace
-              </Typography>
-              <Typography variant="h6" className="mb-4 opacity-90">
-                Trade verified carbon credits from global reforestation projects
-                with blockchain transparency
-              </Typography>
-
-              {/* Real-time Market Indicators */}
-              <Grid container spacing={2} className="mt-2">
-                <Grid item xs={6} sm={3}>
-                  <Box className="text-center">
-                    <Typography
-                      variant="h4"
-                      className="font-bold flex items-center justify-center"
-                    >
-                      {marketStats.totalListings}
-                      <TrendingUp className="ml-1" />
-                    </Typography>
-                    <Typography variant="body2" className="opacity-75">
-                      Active Listings
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box className="text-center">
-                    <Typography variant="h4" className="font-bold">
-                      ${marketStats.totalValue}
-                    </Typography>
-                    <Typography variant="body2" className="opacity-75">
-                      Market Value
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box className="text-center">
-                    <Typography
-                      variant="h4"
-                      className="font-bold flex items-center justify-center"
-                    >
-                      ${marketStats.avgPrice}
-                      {marketStats.priceChange24h >= 0 ? (
-                        <TrendingUp className="ml-1 text-green-300" />
-                      ) : (
-                        <TrendingDown className="ml-1 text-red-300" />
-                      )}
-                    </Typography>
-                    <Typography variant="body2" className="opacity-75">
-                      Avg Price
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Box className="text-center">
-                    <Typography
-                      variant="h4"
-                      className="font-bold flex items-center justify-center"
-                    >
-                      {marketStats.activeAuctions}
-                      <LocalFireDepartment className="ml-1 text-orange-300" />
-                    </Typography>
-                    <Typography variant="body2" className="opacity-75">
-                      Live Auctions
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Box className="text-center">
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleOpenListDialog}
-                  disabled={!account}
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255,255,255,0.3)",
-                    color: "white",
-                    py: 2,
-                    px: 4,
-                    fontSize: "1.1rem",
-                    fontWeight: "bold",
-                    borderRadius: "12px",
-                    "&:hover": {
-                      backgroundColor: "rgba(255,255,255,0.3)",
-                      transform: "translateY(-2px)",
-                    },
-                    transition: "all 0.3s ease",
-                  }}
-                  startIcon={<LocalOffer />}
-                >
-                  List Your Credit
-                </Button>
-                {!account && (
-                  <Typography
-                    variant="caption"
-                    className="block mt-2 opacity-75"
-                  >
-                    Connect wallet to list credits
-                  </Typography>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
+      {/* Authentication Check */}
+      {authLoading ? (
+        <Box className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <CircularProgress size={60} color="primary" />
+            <Typography variant="h6" className="mt-4 text-gray-600">
+              Loading marketplace...
+            </Typography>
+          </div>
         </Box>
-      </motion.div>
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-6"
-        >
-          <Alert severity="error" className="rounded-lg shadow-md">
-            {error}
-          </Alert>
-        </motion.div>
-      )}
-      {/* Enhanced Search and Filter Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <Card className="mb-6 shadow-lg rounded-xl overflow-hidden">
-          <CardContent className="p-4">
-            <Box className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-              {/* Search Bar */}
-              <TextField
-                label="Search credits, projects, or regions..."
-                variant="outlined"
-                size="medium"
-                value={searchTerm}
-                onChange={handleSearchChange}
+      ) : !currentUser ? (
+        <Box className="text-center py-16">
+          <Card className="max-w-md mx-auto p-8">
+            <Typography variant="h4" className="mb-4 text-gray-800">
+              Sign In Required
+            </Typography>
+            <Typography variant="body1" className="mb-6 text-gray-600">
+              Please sign in to access the carbon credit marketplace and start
+              trading.
+            </Typography>
+            <Button
+              href="/login"
+              variant="contained"
+              size="large"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Sign In
+            </Button>
+          </Card>
+        </Box>
+      ) : (
+        <>
+          {/* Enhanced Hero Section with Live Market Data */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white shadow-2xl relative overflow-hidden">
+              {/* Background Pattern */}
+              <Box
                 sx={{
-                  flexGrow: 1,
-                  minWidth: "300px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search color="primary" />
-                    </InputAdornment>
-                  ),
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "300px",
+                  height: "300px",
+                  background:
+                    "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+                  borderRadius: "50%",
                 }}
               />
 
-              {/* Quick Actions */}
-              <Box className="flex gap-2 flex-wrap">
-                <Button
-                  variant={showFilters ? "contained" : "outlined"}
-                  startIcon={<FilterList />}
-                  onClick={toggleFilters}
-                  className="rounded-lg"
-                >
-                  Filters
-                  {Object.values(filters).some(
-                    (f) => f !== "all" && !Array.isArray(f)
-                  ) && <Badge color="primary" variant="dot" className="ml-2" />}
-                </Button>
-
-                <Tooltip title="Refresh listings">
-                  <IconButton
-                    color="primary"
-                    onClick={handleRefresh}
-                    className="border border-gray-300 hover:border-primary-main rounded-lg"
-                  >
-                    <Refresh />
-                  </IconButton>
-                </Tooltip>
-
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={resetFilters}
-                  className="rounded-lg"
-                >
-                  Clear
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Advanced Filters Collapse */}
-            <Collapse in={showFilters}>
-              <Divider className="my-4" />
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6} md={3}>
+              <Grid container spacing={4} alignItems="center">
+                <Grid item xs={12} md={8}>
                   <Typography
-                    variant="subtitle2"
-                    className="mb-2 font-semibold"
+                    variant="h3"
+                    component="h1"
+                    gutterBottom
+                    className="font-bold"
+                    sx={{ fontSize: { xs: "2rem", md: "3rem" } }}
                   >
-                    Price Range (MATIC)
+                    🌍 Carbon Credit Marketplace
                   </Typography>
-                  <Slider
-                    value={filters.priceRange}
-                    onChange={(e, newValue) =>
-                      handleFilterChange("priceRange", newValue)
-                    }
-                    valueLabelDisplay="auto"
-                    min={0}
-                    max={100}
-                    step={5}
-                    marks={[
-                      { value: 0, label: "$0" },
-                      { value: 50, label: "$50" },
-                      { value: 100, label: "$100+" },
-                    ]}
-                  />
-                </Grid>
+                  <Typography variant="h6" className="mb-4 opacity-90">
+                    Trade verified carbon credits from global reforestation
+                    projects with blockchain transparency
+                  </Typography>
 
-                <Grid item xs={12} sm={6} md={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Region</InputLabel>
-                    <Select
-                      value={filters.region}
-                      label="Region"
-                      onChange={(e) =>
-                        handleFilterChange("region", e.target.value)
-                      }
-                    >
-                      <MenuItem value="all">All Regions</MenuItem>
-                      <MenuItem value="Brazil">Brazil</MenuItem>
-                      <MenuItem value="Kenya">Kenya</MenuItem>
-                      <MenuItem value="Canada">Canada</MenuItem>
-                      <MenuItem value="Indonesia">Indonesia</MenuItem>
-                      <MenuItem value="Norway">Norway</MenuItem>
-                    </Select>
-                  </FormControl>
+                  {/* Real-time Market Indicators */}
+                  <Grid container spacing={2} className="mt-2">
+                    <Grid item xs={6} sm={3}>
+                      <Box className="text-center">
+                        <Typography
+                          variant="h4"
+                          className="font-bold flex items-center justify-center"
+                        >
+                          {marketStats.totalListings}
+                          <TrendingUp className="ml-1" />
+                        </Typography>
+                        <Typography variant="body2" className="opacity-75">
+                          Active Listings
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box className="text-center">
+                        <Typography variant="h4" className="font-bold">
+                          ${marketStats.totalValue}
+                        </Typography>
+                        <Typography variant="body2" className="opacity-75">
+                          Market Value
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box className="text-center">
+                        <Typography
+                          variant="h4"
+                          className="font-bold flex items-center justify-center"
+                        >
+                          ${marketStats.avgPrice}
+                          {marketStats.priceChange24h >= 0 ? (
+                            <TrendingUp className="ml-1 text-green-300" />
+                          ) : (
+                            <TrendingDown className="ml-1 text-red-300" />
+                          )}
+                        </Typography>
+                        <Typography variant="body2" className="opacity-75">
+                          Avg Price
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box className="text-center">
+                        <Typography
+                          variant="h4"
+                          className="font-bold flex items-center justify-center"
+                        >
+                          {marketStats.activeAuctions}
+                          <LocalFireDepartment className="ml-1 text-orange-300" />
+                        </Typography>
+                        <Typography variant="body2" className="opacity-75">
+                          Live Auctions
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Project Type</InputLabel>
-                    <Select
-                      value={filters.projectType}
-                      label="Project Type"
-                      onChange={(e) =>
-                        handleFilterChange("projectType", e.target.value)
-                      }
+                <Grid item xs={12} md={4}>
+                  <Box className="text-center">
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={handleOpenListDialog}
+                      disabled={!account}
+                      sx={{
+                        backgroundColor: "rgba(255,255,255,0.2)",
+                        backdropFilter: "blur(10px)",
+                        border: "1px solid rgba(255,255,255,0.3)",
+                        color: "white",
+                        py: 2,
+                        px: 4,
+                        fontSize: "1.1rem",
+                        fontWeight: "bold",
+                        borderRadius: "12px",
+                        "&:hover": {
+                          backgroundColor: "rgba(255,255,255,0.3)",
+                          transform: "translateY(-2px)",
+                        },
+                        transition: "all 0.3s ease",
+                      }}
+                      startIcon={<LocalOffer />}
                     >
-                      <MenuItem value="all">All Types</MenuItem>
-                      <MenuItem value="reforestation">Reforestation</MenuItem>
-                      <MenuItem value="afforestation">Afforestation</MenuItem>
-                      <MenuItem value="mangrove">Mangrove</MenuItem>
-                      <MenuItem value="peatland">Peatland</MenuItem>
-                      <MenuItem value="rewilding">Rewilding</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Sort By</InputLabel>
-                    <Select
-                      value={filters.sortBy}
-                      label="Sort By"
-                      onChange={(e) =>
-                        handleFilterChange("sortBy", e.target.value)
-                      }
-                    >
-                      <MenuItem value="newest">Newest First</MenuItem>
-                      <MenuItem value="price_low">Price: Low to High</MenuItem>
-                      <MenuItem value="price_high">Price: High to Low</MenuItem>
-                      <MenuItem value="ending_soon">Ending Soon</MenuItem>
-                    </Select>
-                  </FormControl>
+                      List Your Credit
+                    </Button>
+                    {!account && (
+                      <Typography
+                        variant="caption"
+                        className="block mt-2 opacity-75"
+                      >
+                        Connect wallet to list credits
+                      </Typography>
+                    )}
+                  </Box>
                 </Grid>
               </Grid>
-            </Collapse>
-          </CardContent>
-        </Card>
-      </motion.div>
-      {/* Enhanced Tabs with Icons and Badges */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 4 }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="marketplace tabs"
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              "& .MuiTab-root": {
-                minHeight: "64px",
-                fontWeight: "600",
-                fontSize: "1rem",
-              },
-            }}
-          >
-            <Tab
-              icon={<Inventory />}
-              label={`All Listings (${listings.length})`}
-              iconPosition="start"
-            />
-            <Tab
-              icon={<ShoppingCart />}
-              label={`Buy Now (${
-                listings.filter((l) => !l.is_auction).length
-              })`}
-              iconPosition="start"
-            />
-            <Tab
-              icon={<LocalOffer />}
-              label={`Live Auctions (${marketStats.activeAuctions})`}
-              iconPosition="start"
-            />
-            <Tab
-              icon={<LocalFireDepartment />}
-              label={`Featured (${
-                listings.filter((l) => l.is_featured).length
-              })`}
-              iconPosition="start"
-            />
-          </Tabs>
-        </Box>
-      </motion.div>{" "}
-      {/* Enhanced Results Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        {loading && listings.length === 0 ? (
-          <Box display="flex" justifyContent="center" py={12}>
-            <Box textAlign="center">
-              <CircularProgress size={60} thickness={4} />
-              <Typography variant="h6" className="mt-4 text-gray-600">
-                Loading marketplace...
-              </Typography>
             </Box>
-          </Box>
-        ) : filteredListings.length === 0 ? (
-          <Box py={12} textAlign="center">
-            <Nature sx={{ fontSize: 80, color: "text.secondary", mb: 2 }} />
-            <Typography variant="h5" color="text.secondary" className="mb-2">
-              No credits found
-            </Typography>
-            <Typography variant="body1" color="text.secondary" className="mb-4">
-              Try adjusting your search or filters
-            </Typography>
-            <Button variant="outlined" onClick={resetFilters}>
-              Clear all filters
-            </Button>
-          </Box>
-        ) : (
-          <>
-            {/* Results Header */}
-            <Box className="flex justify-between items-center mb-6">
-              <Typography variant="h6" className="font-semibold">
-                {filteredListings.length} credit
-                {filteredListings.length !== 1 ? "s" : ""} found
-              </Typography>
-              <Box className="flex items-center gap-2">
-                <Typography variant="body2" color="text.secondary">
-                  View:
+          </motion.div>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-6"
+            >
+              <Alert severity="error" className="rounded-lg shadow-md">
+                {error}
+              </Alert>
+            </motion.div>
+          )}
+          {/* Enhanced Search and Filter Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Card className="mb-6 shadow-lg rounded-xl overflow-hidden">
+              <CardContent className="p-4">
+                <Box className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+                  {/* Search Bar */}
+                  <TextField
+                    label="Search credits, projects, or regions..."
+                    variant="outlined"
+                    size="medium"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    sx={{
+                      flexGrow: 1,
+                      minWidth: "300px",
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                      },
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search color="primary" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  {/* Quick Actions */}
+                  <Box className="flex gap-2 flex-wrap">
+                    <Button
+                      variant={showFilters ? "contained" : "outlined"}
+                      startIcon={<FilterList />}
+                      onClick={toggleFilters}
+                      className="rounded-lg"
+                    >
+                      Filters
+                      {Object.values(filters).some(
+                        (f) => f !== "all" && !Array.isArray(f)
+                      ) && (
+                        <Badge color="primary" variant="dot" className="ml-2" />
+                      )}
+                    </Button>
+
+                    <Tooltip title="Refresh listings">
+                      <IconButton
+                        color="primary"
+                        onClick={handleRefresh}
+                        className="border border-gray-300 hover:border-primary-main rounded-lg"
+                      >
+                        <Refresh />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={resetFilters}
+                      className="rounded-lg"
+                    >
+                      Clear
+                    </Button>
+                  </Box>
+                </Box>
+
+                {/* Advanced Filters Collapse */}
+                <Collapse in={showFilters}>
+                  <Divider className="my-4" />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Typography
+                        variant="subtitle2"
+                        className="mb-2 font-semibold"
+                      >
+                        Price Range (MATIC)
+                      </Typography>
+                      <Slider
+                        value={filters.priceRange}
+                        onChange={(e, newValue) =>
+                          handleFilterChange("priceRange", newValue)
+                        }
+                        valueLabelDisplay="auto"
+                        min={0}
+                        max={100}
+                        step={5}
+                        marks={[
+                          { value: 0, label: "$0" },
+                          { value: 50, label: "$50" },
+                          { value: 100, label: "$100+" },
+                        ]}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Region</InputLabel>
+                        <Select
+                          value={filters.region}
+                          label="Region"
+                          onChange={(e) =>
+                            handleFilterChange("region", e.target.value)
+                          }
+                        >
+                          <MenuItem value="all">All Regions</MenuItem>
+                          <MenuItem value="Brazil">Brazil</MenuItem>
+                          <MenuItem value="Kenya">Kenya</MenuItem>
+                          <MenuItem value="Canada">Canada</MenuItem>
+                          <MenuItem value="Indonesia">Indonesia</MenuItem>
+                          <MenuItem value="Norway">Norway</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Project Type</InputLabel>
+                        <Select
+                          value={filters.projectType}
+                          label="Project Type"
+                          onChange={(e) =>
+                            handleFilterChange("projectType", e.target.value)
+                          }
+                        >
+                          <MenuItem value="all">All Types</MenuItem>
+                          <MenuItem value="reforestation">
+                            Reforestation
+                          </MenuItem>
+                          <MenuItem value="afforestation">
+                            Afforestation
+                          </MenuItem>
+                          <MenuItem value="mangrove">Mangrove</MenuItem>
+                          <MenuItem value="peatland">Peatland</MenuItem>
+                          <MenuItem value="rewilding">Rewilding</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Sort By</InputLabel>
+                        <Select
+                          value={filters.sortBy}
+                          label="Sort By"
+                          onChange={(e) =>
+                            handleFilterChange("sortBy", e.target.value)
+                          }
+                        >
+                          <MenuItem value="newest">Newest First</MenuItem>
+                          <MenuItem value="price_low">
+                            Price: Low to High
+                          </MenuItem>
+                          <MenuItem value="price_high">
+                            Price: High to Low
+                          </MenuItem>
+                          <MenuItem value="ending_soon">Ending Soon</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {/* Enhanced Tabs with Icons and Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 4 }}>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                aria-label="marketplace tabs"
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  "& .MuiTab-root": {
+                    minHeight: "64px",
+                    fontWeight: "600",
+                    fontSize: "1rem",
+                  },
+                }}
+              >
+                <Tab
+                  icon={<Inventory />}
+                  label={`All Listings (${listings.length})`}
+                  iconPosition="start"
+                />
+                <Tab
+                  icon={<ShoppingCart />}
+                  label={`Buy Now (${
+                    listings.filter((l) => !l.is_auction).length
+                  })`}
+                  iconPosition="start"
+                />
+                <Tab
+                  icon={<LocalOffer />}
+                  label={`Live Auctions (${marketStats.activeAuctions})`}
+                  iconPosition="start"
+                />
+                <Tab
+                  icon={<LocalFireDepartment />}
+                  label={`Featured (${
+                    listings.filter((l) => l.is_featured).length
+                  })`}
+                  iconPosition="start"
+                />
+              </Tabs>
+            </Box>
+          </motion.div>{" "}
+          {/* Enhanced Results Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            {loading && listings.length === 0 ? (
+              <Box display="flex" justifyContent="center" py={12}>
+                <Box textAlign="center">
+                  <CircularProgress size={60} thickness={4} />
+                  <Typography variant="h6" className="mt-4 text-gray-600">
+                    Loading marketplace...
+                  </Typography>
+                </Box>
+              </Box>
+            ) : filteredListings.length === 0 ? (
+              <Box py={12} textAlign="center">
+                <Nature sx={{ fontSize: 80, color: "text.secondary", mb: 2 }} />
+                <Typography
+                  variant="h5"
+                  color="text.secondary"
+                  className="mb-2"
+                >
+                  No credits found
                 </Typography>
-                <Button
-                  variant={viewMode === "grid" ? "contained" : "outlined"}
-                  size="small"
-                  onClick={() => setViewMode("grid")}
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  className="mb-4"
                 >
-                  Grid
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "contained" : "outlined"}
-                  size="small"
-                  onClick={() => setViewMode("list")}
-                >
-                  List
+                  Try adjusting your search or filters
+                </Typography>
+                <Button variant="outlined" onClick={resetFilters}>
+                  Clear all filters
                 </Button>
               </Box>
-            </Box>
-
-            {/* Enhanced Grid Layout */}
-            <Grid container spacing={3}>
-              <AnimatePresence>
-                {filteredListings.map((listing, index) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={listing.id}>
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.4, delay: index * 0.1 }}
-                      whileHover={{ y: -5 }}
-                      className="h-full"
+            ) : (
+              <>
+                {/* Results Header */}
+                <Box className="flex justify-between items-center mb-6">
+                  <Typography variant="h6" className="font-semibold">
+                    {filteredListings.length} credit
+                    {filteredListings.length !== 1 ? "s" : ""} found
+                  </Typography>
+                  <Box className="flex items-center gap-2">
+                    <Typography variant="body2" color="text.secondary">
+                      View:
+                    </Typography>
+                    <Button
+                      variant={viewMode === "grid" ? "contained" : "outlined"}
+                      size="small"
+                      onClick={() => setViewMode("grid")}
                     >
-                      <EnhancedMarketplaceCard
-                        listing={listing}
-                        onBuyClick={() => handleOpenBuyDialog(listing)}
-                        onBidClick={() => handleOpenBidDialog(listing)}
-                      />
-                    </motion.div>
-                  </Grid>
-                ))}
-              </AnimatePresence>
-            </Grid>
-          </>
-        )}
-      </motion.div>
-      {/* List Dialog */}
-      <Dialog open={openListDialog} onClose={handleCloseListDialog}>
-        <DialogTitle>List a Carbon Credit</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            name="tokenId"
-            label="Token ID"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newListing.tokenId}
-            onChange={handleListingChange}
+                      Grid
+                    </Button>
+                    <Button
+                      variant={viewMode === "list" ? "contained" : "outlined"}
+                      size="small"
+                      onClick={() => setViewMode("list")}
+                    >
+                      List
+                    </Button>
+                  </Box>
+                </Box>
+
+                {/* Enhanced Grid Layout */}
+                <Grid container spacing={3}>
+                  <AnimatePresence>
+                    {filteredListings.map((listing, index) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={listing.id}>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.4, delay: index * 0.1 }}
+                          whileHover={{ y: -5 }}
+                          className="h-full"
+                        >
+                          <EnhancedMarketplaceCard
+                            listing={listing}
+                            onBuyClick={() => handleOpenBuyDialog(listing)}
+                            onBidClick={() => handleOpenBidDialog(listing)}
+                          />
+                        </motion.div>
+                      </Grid>
+                    ))}
+                  </AnimatePresence>
+                </Grid>
+              </>
+            )}
+          </motion.div>
+          {/* List Dialog */}
+          <Dialog open={openListDialog} onClose={handleCloseListDialog}>
+            <DialogTitle>List a Carbon Credit</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                name="tokenId"
+                label="Token ID"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={newListing.tokenId}
+                onChange={handleListingChange}
+              />
+              <TextField
+                margin="dense"
+                name="projectId"
+                label="Project ID"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={newListing.projectId}
+                onChange={handleListingChange}
+              />
+              <TextField
+                margin="dense"
+                name="price"
+                label="Price (MATIC)"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={newListing.price}
+                onChange={handleListingChange}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseListDialog}>Cancel</Button>
+              <Button
+                onClick={handleCreateListing}
+                variant="contained"
+                color="primary"
+              >
+                List Credit
+              </Button>
+            </DialogActions>
+          </Dialog>{" "}
+          {/* Buy Dialog */}
+          <Dialog open={openBuyDialog} onClose={handleCloseBuyDialog}>
+            <DialogTitle>Buy Carbon Credit</DialogTitle>
+            <DialogContent>
+              {selectedListing && (
+                <Box>
+                  <Typography variant="h6">
+                    Token #{selectedListing.token_id}
+                  </Typography>
+                  <Typography>Project: {selectedListing.project_id}</Typography>
+                  <Typography>
+                    Price: {selectedListing.current_price} MATIC
+                  </Typography>
+                  <Typography className="mt-4 font-bold">
+                    Are you sure you want to purchase this carbon credit?
+                  </Typography>
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseBuyDialog}>Cancel</Button>
+              <Button
+                onClick={handleBuyCredit}
+                variant="contained"
+                color="primary"
+              >
+                Confirm Purchase
+              </Button>
+            </DialogActions>
+          </Dialog>
+          {/* Bid Dialog */}{" "}
+          <PlaceBid
+            listing={selectedListing}
+            onBidPlaced={handleBidPlaced}
+            open={openBidDialog}
+            onClose={handleCloseBidDialog}
           />
-          <TextField
-            margin="dense"
-            name="projectId"
-            label="Project ID"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newListing.projectId}
-            onChange={handleListingChange}
-          />
-          <TextField
-            margin="dense"
-            name="price"
-            label="Price (MATIC)"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={newListing.price}
-            onChange={handleListingChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseListDialog}>Cancel</Button>
-          <Button
-            onClick={handleCreateListing}
-            variant="contained"
-            color="primary"
+          {/* Notification system */}
+          <Snackbar
+            open={notification.open}
+            autoHideDuration={6000}
+            onClose={handleCloseNotification}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
-            List Credit
-          </Button>
-        </DialogActions>
-      </Dialog>{" "}
-      {/* Buy Dialog */}
-      <Dialog open={openBuyDialog} onClose={handleCloseBuyDialog}>
-        <DialogTitle>Buy Carbon Credit</DialogTitle>
-        <DialogContent>
-          {selectedListing && (
-            <Box>
-              <Typography variant="h6">
-                Token #{selectedListing.token_id}
-              </Typography>
-              <Typography>Project: {selectedListing.project_id}</Typography>
-              <Typography>
-                Price: {selectedListing.current_price} MATIC
-              </Typography>
-              <Typography className="mt-4 font-bold">
-                Are you sure you want to purchase this carbon credit?
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseBuyDialog}>Cancel</Button>
-          <Button onClick={handleBuyCredit} variant="contained" color="primary">
-            Confirm Purchase
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* Bid Dialog */}{" "}
-      <PlaceBid
-        listing={selectedListing}
-        onBidPlaced={handleBidPlaced}
-        open={openBidDialog}
-        onClose={handleCloseBidDialog}
-      />
-      {/* Notification system */}
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseNotification}
-          severity={notification.type}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
+            <Alert
+              onClose={handleCloseNotification}
+              severity={notification.type}
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              {notification.message}
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </Container>
   );
 }
