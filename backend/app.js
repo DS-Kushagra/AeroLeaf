@@ -78,7 +78,7 @@ app.use("/api/marketplace", marketplaceRoutes);
 app.use("/api/credits", creditsRoutes);
 app.use("/api/legacy/credits", buyCreditsRoute); // Keep original for backward compatibility
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Load Swagger documentation
 const swaggerUi = require("swagger-ui-express");
@@ -165,8 +165,8 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json(errorResponse);
 });
 
-// 404 handler
-app.use("*", (req, res) => {
+// 404 handler - must be last
+app.use((req, res, next) => {
   logger.warn("404 Not Found", {
     url: req.originalUrl,
     method: req.method,
@@ -209,24 +209,9 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`🚀 AeroLeaf backend server running on port ${PORT}`, {
-    environment: process.env.NODE_ENV,
-    port: PORT,
-    timestamp: new Date().toISOString(),
-  });
-
-  if (process.env.NODE_ENV === "development") {
-    logger.info(`📚 API Documentation: http://localhost:${PORT}/docs`);
-    logger.info(`🏥 Health Check: http://localhost:${PORT}/health`);
-  }
-});
+module.exports = app;
 
 module.exports = app;
-app.use((req, res) => {
-  res.status(404).json({ message: "API endpoint not found" });
-});
 
 // Start server with WebSocket support
 try {

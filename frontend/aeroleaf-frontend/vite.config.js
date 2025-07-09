@@ -8,13 +8,13 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend during development
       "/api": {
-        target: "http://localhost:5000",
+        target: "http://localhost:5001",
         changeOrigin: true,
         secure: false,
       },
       // Proxy WebSocket connections
       "/socket.io": {
-        target: "ws://localhost:5000",
+        target: "ws://localhost:5001",
         ws: true,
         changeOrigin: true,
         secure: false,

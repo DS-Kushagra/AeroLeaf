@@ -6,7 +6,7 @@ import authService from "./firebase";
 
 class ApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5001";
     this.timeout = 30000; // 30 seconds
   }
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const reportController = require("../controllers/report.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+const { authMiddleware } = require("../middleware/auth.middleware");
 
 router.post("/report", authMiddleware, reportController.createReport);
 router.get("/reports", authMiddleware, reportController.getAllReports);
