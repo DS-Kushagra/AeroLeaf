@@ -21,7 +21,18 @@ import {
   ShowChart,
   PieChart,
   TrendingUp,
+  School,
   School as SchoolIcon,
+  Map,
+  ViewList,
+  LocalAtm,
+  Nature,
+  Public,
+  Timeline,
+  VerifiedUser,
+  CheckCircle,
+  AccountCircle,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import MapView from "../components/MapView";
@@ -266,7 +277,6 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
-
         <InfoCard
           title="Getting Started with AeroLeaf"
           id="dashboard-welcome"
@@ -283,26 +293,27 @@ export default function Dashboard() {
             detailed analytics.
           </Typography>
         </InfoCard>
-
         {/* Quick Stats Cards */}
-        <Grid container spacing={3} className="mb-8 fade-in">
+        <Grid container spacing={3} className="mb-8">
           <Grid item xs={12} sm={6} md={3}>
-            <Card className="border-l-4 border-green-500 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <CardContent className="p-4">
                 <Typography
                   variant="body2"
-                  color="textSecondary"
-                  className="flex items-center"
+                  className="flex items-center font-medium text-green-800"
                 >
-                  <ShowChart fontSize="small" className="mr-1 text-green-500" />
+                  <ShowChart fontSize="small" className="mr-2 text-green-600" />
                   Total Carbon Offsets
                 </Typography>
                 <Typography
-                  variant="h5"
+                  variant="h4"
                   component="div"
-                  className="font-bold my-1"
+                  className="font-bold my-2 text-gray-900"
                 >
-                  48.0 tCO₂e
+                  48.0
+                  <span className="text-lg ml-1 font-medium text-gray-600">
+                    tCO₂e
+                  </span>
                 </Typography>
                 <Typography
                   variant="body2"
@@ -315,107 +326,121 @@ export default function Dashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card className="border-l-4 border-blue-500 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <CardContent className="p-4">
                 <Typography
                   variant="body2"
-                  color="textSecondary"
-                  className="flex items-center"
+                  className="flex items-center font-medium text-blue-800"
                 >
-                  <PieChart fontSize="small" className="mr-1 text-blue-500" />
+                  <PieChart fontSize="small" className="mr-2 text-blue-600" />
                   Active Credits
                 </Typography>
                 <Typography
-                  variant="h5"
+                  variant="h4"
                   component="div"
-                  className="font-bold my-1"
+                  className="font-bold my-2 text-gray-900"
                 >
-                  37.8 tCO₂e
+                  37.8
+                  <span className="text-lg ml-1 font-medium text-gray-600">
+                    tCO₂e
+                  </span>
                 </Typography>
                 <Typography
                   variant="body2"
-                  className="flex items-center text-blue-600"
+                  className="flex items-center gap-1 text-blue-700"
                 >
-                  2 active certificates
+                  <VerifiedUser fontSize="small" />2 active certificates
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card className="border-l-4 border-amber-500 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <CardContent className="p-4">
                 <Typography
                   variant="body2"
-                  color="textSecondary"
-                  className="flex items-center"
+                  className="flex items-center font-medium text-amber-800"
                 >
-                  <Analytics fontSize="small" className="mr-1 text-amber-500" />
+                  <Analytics fontSize="small" className="mr-2 text-amber-600" />
                   Pending Verification
                 </Typography>
                 <Typography
-                  variant="h5"
+                  variant="h4"
                   component="div"
-                  className="font-bold my-1"
+                  className="font-bold my-2 text-gray-900"
                 >
-                  22.3 tCO₂e
+                  22.3
+                  <span className="text-lg ml-1 font-medium text-gray-600">
+                    tCO₂e
+                  </span>
                 </Typography>
                 <Typography
                   variant="body2"
-                  className="flex items-center text-amber-600"
+                  className="flex items-center gap-1 text-amber-700"
                 >
+                  <Timeline fontSize="small" />
                   Estimated completion in 14 days
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card className="border-l-4 border-purple-500 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+            <Card className="bg-gradient-to-br from-purple-50 to-fuchsia-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <CardContent className="p-4">
                 <Typography
                   variant="body2"
-                  color="textSecondary"
-                  className="flex items-center"
+                  className="flex items-center font-medium text-purple-800"
                 >
                   <RestoreFromTrash
                     fontSize="small"
-                    className="mr-1 text-purple-500"
+                    className="mr-2 text-purple-600"
                   />
                   Retired Credits
                 </Typography>
                 <Typography
-                  variant="h5"
+                  variant="h4"
                   component="div"
-                  className="font-bold my-1"
+                  className="font-bold my-2 text-gray-900"
                 >
-                  10.2 tCO₂e
+                  10.2
+                  <span className="text-lg ml-1 font-medium text-gray-600">
+                    tCO₂e
+                  </span>
                 </Typography>
                 <Typography
                   variant="body2"
-                  className="flex items-center text-purple-600"
+                  className="flex items-center gap-1 text-purple-700"
                 >
-                  1 certificate retired
+                  <CheckCircle fontSize="small" />1 certificate retired
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
-
         {/* Reforestation Sites Section */}
-        <Box className="mb-10 card bg-white rounded-lg p-6 shadow-md">
+        <Box className="mb-10 card bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex justify-between items-center mb-6">
-            <Typography
-              variant="h5"
-              component="h2"
-              className="font-semibold text-gray-800"
-            >
-              Reforestation Sites
-              <HelpTooltip title="Explore reforestation sites on the map or in list view. Use the time slider to see how sites have changed over time." />
-            </Typography>
+            <div>
+              <Typography
+                variant="h5"
+                component="h2"
+                className="font-bold text-gray-900 mb-1"
+              >
+                Reforestation Sites
+              </Typography>
+              <Typography variant="body2" className="text-gray-600">
+                Interactive visualization of our global reforestation projects
+              </Typography>
+            </div>
             <div className="flex space-x-2">
               <Button
                 variant={viewType === "map" ? "contained" : "outlined"}
                 size="small"
                 onClick={() => setViewType("map")}
+                className={
+                  viewType === "map" ? "bg-green-600 hover:bg-green-700" : ""
+                }
+                startIcon={<Map />}
               >
                 Map View
               </Button>
@@ -423,29 +448,45 @@ export default function Dashboard() {
                 variant={viewType === "list" ? "contained" : "outlined"}
                 size="small"
                 onClick={() => setViewType("list")}
+                className={
+                  viewType === "list" ? "bg-green-600 hover:bg-green-700" : ""
+                }
+                startIcon={<ViewList />}
               >
                 List View
               </Button>
             </div>
           </div>
 
-          <div className="mb-6">
-            <Typography className="mb-2 text-gray-600">
-              Time period: {timeLabels[Math.floor(monthOffset / 6)]}
+          <div className="mb-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <Typography className="mb-3 text-gray-700 font-medium flex items-center gap-2">
+              <Timeline fontSize="small" />
+              Time Period:{" "}
+              <span className="text-green-600 font-semibold">
+                {timeLabels[Math.floor(monthOffset / 6)]}
+              </span>
             </Typography>
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-              <input
-                type="range"
-                min={0}
-                max={24}
-                step={6}
-                value={monthOffset}
-                onChange={(e) => setMonthOffset(Number(e.target.value))}
-                className="w-full sm:w-3/4 accent-green-600"
-              />
-              <div className="flex justify-between w-full sm:w-1/4 px-2">
-                <span className="text-sm text-gray-500">Past</span>
-                <span className="text-sm text-gray-500">Current</span>
+              <div className="w-full sm:w-3/4 px-2">
+                <input
+                  type="range"
+                  min={0}
+                  max={24}
+                  step={6}
+                  value={monthOffset}
+                  onChange={(e) => setMonthOffset(Number(e.target.value))}
+                  className="w-full accent-green-600 h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
+                />
+              </div>
+              <div className="flex justify-between w-full sm:w-1/4 px-4">
+                <span className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                  <ArrowUpward fontSize="small" className="text-gray-400" />
+                  Past
+                </span>
+                <span className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                  Current
+                  <ArrowDownward fontSize="small" className="text-gray-400" />
+                </span>
               </div>
             </div>
           </div>
@@ -499,27 +540,39 @@ export default function Dashboard() {
             </div>
           )}
         </Box>
-
         {/* User's Carbon Credits */}
-        <Box className="mb-10 card bg-white rounded-lg p-6 shadow-md">
-          <Box className="flex justify-between items-center mb-6">
-            <Typography
-              variant="h5"
-              component="h2"
-              className="font-semibold text-gray-800"
-            >
-              Your Carbon Credits
-              <HelpTooltip title="This section shows your carbon credit portfolio with details about each credit's status and verification" />
-            </Typography>
-            <Button
-              component={Link}
-              to="/marketplace"
-              color="primary"
-              variant="contained"
-              className="bg-gradient-to-r from-green-600 to-green-700 text-white"
-            >
-              Trade Credits
-            </Button>
+        <Box className="mb-10 card bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+          <Box className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <div>
+              <Typography
+                variant="h5"
+                component="h2"
+                className="font-bold text-gray-900 mb-1"
+              >
+                Carbon Credit Portfolio
+              </Typography>
+              <Typography variant="body2" className="text-gray-600">
+                Manage and track your verified carbon credits
+              </Typography>
+            </div>
+            <div className="flex gap-3 self-end sm:self-auto">
+              <Button
+                startIcon={<RestoreFromTrash />}
+                variant="outlined"
+                className="border-green-600 text-green-600 hover:bg-green-50"
+              >
+                Retire Credits
+              </Button>
+              <Button
+                component={Link}
+                to="/marketplace"
+                startIcon={<ShoppingCart />}
+                variant="contained"
+                className="bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg"
+              >
+                Trade Credits
+              </Button>
+            </div>
           </Box>
 
           {loading ? (
@@ -576,29 +629,43 @@ export default function Dashboard() {
               {userCredits.map((credit) => (
                 <Grid item xs={12} md={6} lg={4} key={credit.id}>
                   <Card
-                    className={`border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-all ${
-                      credit.status === "retired" ? "bg-gray-50" : ""
+                    className={`rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
+                      credit.status === "retired"
+                        ? "bg-gray-50 border-2 border-gray-200"
+                        : "bg-white border border-gray-100"
                     }`}
                   >
-                    <CardContent className="p-5">
-                      <Box className="flex justify-between items-start mb-3">
+                    <CardContent className="p-6">
+                      <Box className="flex justify-between items-start mb-4">
                         <div>
-                          <Typography variant="h6" className="font-bold">
+                          <Typography
+                            variant="h6"
+                            className="font-bold text-gray-900 mb-1"
+                          >
                             {credit.project_name}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography
+                            variant="body2"
+                            className="text-gray-500 flex items-center gap-1"
+                          >
+                            <LocalAtm fontSize="small" />
                             Token #{credit.token_id}
                           </Typography>
                         </div>
                         <Chip
                           label={credit.status.toUpperCase()}
-                          color={
-                            credit.status === "verified"
-                              ? "success"
-                              : credit.status === "retired"
-                              ? "secondary"
-                              : "warning"
+                          icon={
+                            credit.status === "verified" ? (
+                              <VerifiedUser />
+                            ) : undefined
                           }
+                          className={`font-medium ${
+                            credit.status === "verified"
+                              ? "bg-green-100 text-green-800"
+                              : credit.status === "retired"
+                              ? "bg-gray-100 text-gray-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
                           size="small"
                         />
                       </Box>
@@ -735,20 +802,34 @@ export default function Dashboard() {
             </Grid>
           )}
         </Box>
-
         {/* Stats & Verification */}
         <Box
           id="stats-section"
-          className="mb-10 card bg-white rounded-lg p-6 shadow-md"
+          className="mb-10 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl p-6 shadow-lg border border-green-100"
         >
-          <Typography
-            variant="h5"
-            component="h2"
-            className="font-semibold mb-6 text-gray-800"
-          >
-            Analytics
-            <HelpTooltip title="View analytics about your carbon offset impact and verification status of your credits" />
-          </Typography>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <Typography
+                variant="h5"
+                component="h2"
+                className="font-bold text-gray-900 mb-1"
+              >
+                Performance Analytics
+              </Typography>
+              <Typography variant="body2" className="text-gray-600">
+                Track your environmental impact and verification progress
+              </Typography>
+            </div>
+            <Button
+              variant="outlined"
+              className="border-green-600 text-green-600 hover:bg-green-50"
+              startIcon={<Analytics />}
+              component={Link}
+              to="/analytics"
+            >
+              Full Analytics
+            </Button>
+          </div>
           <Grid container spacing={4}>
             <Grid
               item
@@ -760,10 +841,18 @@ export default function Dashboard() {
                   : "translate-y-10 opacity-0"
               }`}
             >
-              <Typography variant="h6" className="mb-3 font-medium">
-                Carbon Offset Impact
-              </Typography>
-              <CarbonStats />
+              <Card className="bg-white shadow h-full">
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    className="mb-4 font-semibold flex items-center gap-2"
+                  >
+                    <Timeline className="text-green-600" />
+                    Carbon Offset Impact
+                  </Typography>
+                  <CarbonStats />
+                </CardContent>
+              </Card>
             </Grid>
             <Grid
               item
@@ -775,29 +864,46 @@ export default function Dashboard() {
                   : "translate-y-10 opacity-0"
               }`}
             >
-              <Typography variant="h6" className="mb-3 font-medium">
-                Verification Status
-              </Typography>
-              <VerificationProgress />
+              <Card className="bg-white shadow h-full">
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    className="mb-4 font-semibold flex items-center gap-2"
+                  >
+                    <VerifiedUser className="text-green-600" />
+                    Verification Progress
+                  </Typography>
+                  <VerificationProgress />
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </Box>
-
         {/* Profile & Settings */}
-        <Box className="mb-10 card bg-white rounded-lg p-6 shadow-md">
-          <Typography
-            variant="h5"
-            component="h2"
-            className="font-semibold mb-6 text-gray-800"
-          >
-            Account Management
-            <HelpTooltip title="Manage your user profile and application settings" />
-          </Typography>
+        <Box className="mb-10 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-6 shadow-lg border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <Typography
+                variant="h5"
+                component="h2"
+                className="font-bold text-gray-900 mb-1"
+              >
+                Account Management
+              </Typography>
+              <Typography variant="body2" className="text-gray-600">
+                Manage your profile and customize platform settings
+              </Typography>
+            </div>
+          </div>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              <Card className="border border-gray-100 rounded-lg shadow-sm h-full">
-                <CardContent className="p-5">
-                  <Typography variant="h6" className="mb-4 font-medium">
+              <Card className="bg-white rounded-xl shadow-lg h-full hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <Typography
+                    variant="h6"
+                    className="mb-4 font-semibold flex items-center gap-2"
+                  >
+                    <AccountCircle className="text-indigo-600" />
                     User Profile
                   </Typography>
                   <UserProfile />
@@ -805,10 +911,14 @@ export default function Dashboard() {
               </Card>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Card className="border border-gray-100 rounded-lg shadow-sm h-full">
-                <CardContent className="p-5">
-                  <Typography variant="h6" className="mb-4 font-medium">
-                    Settings
+              <Card className="bg-white rounded-xl shadow-lg h-full hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <Typography
+                    variant="h6"
+                    className="mb-4 font-semibold flex items-center gap-2"
+                  >
+                    <SettingsIcon className="text-indigo-600" />
+                    Platform Settings
                   </Typography>
                   <Settings />
                 </CardContent>
@@ -816,44 +926,53 @@ export default function Dashboard() {
             </Grid>
           </Grid>
         </Box>
-
         <Grid item xs={12}>
-          <InfoCard
-            title="Understanding Carbon Credits"
-            id="dashboard-carbon-credits-info"
-            defaultExpanded={false}
-          >
-            <Typography variant="body1" paragraph>
-              Carbon credits represent one ton of carbon dioxide (CO₂) that has
-              been sequestered (removed) from the atmosphere through
-              reforestation or other carbon capture projects.
-            </Typography>
-            <Typography variant="body1" paragraph>
-              Each credit in your portfolio has been verified through satellite
-              imagery analysis and blockchain technology, ensuring transparency
-              and reliability.
-            </Typography>
-            <Typography variant="body1">
-              You can trade these credits in the Marketplace or retire them to
-              offset your carbon footprint, permanently removing them from
-              circulation.
-            </Typography>
-          </InfoCard>
+          <Box className="bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 rounded-xl p-6 shadow-lg border border-blue-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <School className="text-blue-600 text-2xl" />
+              </div>
+              <div>
+                <Typography variant="h5" className="font-bold text-gray-900">
+                  Understanding Carbon Credits
+                </Typography>
+                <Typography variant="body2" className="text-gray-600">
+                  Learn how carbon credits work and their impact on the
+                  environment
+                </Typography>
+              </div>
+            </div>
+            <div className="bg-white/50 rounded-lg p-5 backdrop-blur-sm">
+              <Typography variant="body1" paragraph className="text-gray-700">
+                Carbon credits represent one ton of carbon dioxide (CO₂) that
+                has been sequestered (removed) from the atmosphere through
+                reforestation or other carbon capture projects.
+              </Typography>
+              <Typography variant="body1" paragraph className="text-gray-700">
+                Each credit in your portfolio has been verified through
+                satellite imagery analysis and blockchain technology, ensuring
+                transparency and reliability.
+              </Typography>
+              <Typography variant="body1" className="text-gray-700">
+                You can trade these credits in the Marketplace or retire them to
+                offset your carbon footprint, permanently removing them from
+                circulation.
+              </Typography>
+            </div>
+          </Box>
         </Grid>
-
         {/* Mobile view marketplace button */}
-        <Box className="fixed bottom-6 right-6 md:hidden">
+        <Box className="fixed bottom-6 right-6 md:hidden z-50">
           <Button
             component={Link}
             to="/marketplace"
             variant="contained"
-            className="bg-green-600 hover:bg-green-700 rounded-full w-12 h-12 shadow-lg"
+            className="bg-green-600 hover:bg-green-700 rounded-full w-14 h-14 shadow-xl hover:shadow-2xl transition-all duration-300"
             aria-label="Go to marketplace"
           >
-            <ShoppingCart />
+            <ShoppingCart className="text-2xl" />
           </Button>
-        </Box>
-
+        </Box>{" "}
         {/* Retire Credit Dialog */}
         <RetireCredit
           credit={selectedCredit}
