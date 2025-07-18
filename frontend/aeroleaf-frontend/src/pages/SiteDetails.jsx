@@ -29,7 +29,7 @@ export default function SiteDetails() {
   useEffect(() => {
     async function fetchSiteData() {
       try {
-        const siteData = await sitesApi.getSiteById(id);
+        const siteData = await sitesApi.getSiteDetails(id);
         setSite(siteData);
         setLoading(false);
       } catch (err) {
