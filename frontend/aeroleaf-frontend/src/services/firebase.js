@@ -1,7 +1,3 @@
-/**
- * Firebase configuration and initialization for the AeroLeaf frontend
- * Production-ready Firebase client configuration
- */
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -14,6 +10,8 @@ import {
   deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -278,7 +276,7 @@ class AuthService {
    * @param {string} password - Current password for reauthentication
    * @returns {Promise<void>}
    */
-  async deleteAccount(password) {
+  async deleteUserAccount(password) {
     if (!this.currentUser) {
       throw new Error("No user logged in");
     }
@@ -333,6 +331,21 @@ class AuthService {
       case "auth/network-request-failed":
         message = "Network error. Please check your connection";
         break;
+      case "auth/popup-closed-by-user":
+        message = "Sign-in popup was closed before completing the sign in";
+        break;
+      case "auth/operation-not-allowed":
+        message = "Google sign-in is not enabled for this Firebase project. Please enable it in the Firebase console under Authentication > Sign-in method.";
+        break;
+      case "auth/cancelled-popup-request":
+        message = "The sign-in popup was cancelled";
+        break;
+      case "auth/popup-blocked":
+        message = "Sign-in popup was blocked by the browser";
+        break;
+      case "auth/account-exists-with-different-credential":
+        message = "An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.";
+        break;
       default:
         message = error.message || message;
     }
@@ -354,6 +367,53 @@ class AuthService {
    */
   isAuthenticated() {
     return !!this.currentUser;
+  }
+
+  /**
+   * Sign in with Google
+   * @returns {Promise<Object>} User credential
+   */
+  async signInWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      const userCredential = await signInWithPopup(this.auth, provider);
+      
+      // Get user token for API calls
+      const token = await userCredential.user.getIdToken();
+      
+      // Store token securely
+      this.storeToken(token);
+      
+      // Check if this is a new user (first time sign-in with Google)
+      const isNewUser = userCredential._tokenResponse.isNewUser;
+      
+      if (isNewUser) {
+        // Create user profile in backend for new Google users
+        await this.createUserProfile(
+          userCredential.user.uid,
+          {
+            email: userCredential.user.email,
+            displayName: userCredential.user.displayName,
+            role: "investor", // Default role
+            photoURL: userCredential.user.photoURL,
+            provider: "google"
+          },
+          token
+        );
+      }
+      
+      return {
+        user: userCredential.user,
+        token,
+        isNewUser
+      };
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
   }
 }
 
