@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Chip,
   ButtonGroup,
+  Avatar,
 } from "@mui/material";
 import {
   ShoppingCart,
@@ -33,6 +34,7 @@ import {
   CheckCircle,
   AccountCircle,
   Settings as SettingsIcon,
+  Edit,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import MapView from "../components/MapView";
@@ -906,7 +908,35 @@ export default function Dashboard() {
                     <AccountCircle className="text-indigo-600" />
                     User Profile
                   </Typography>
-                  <UserProfile />
+                  <div className="text-center py-4">
+                    <div className="mb-4 flex justify-center">
+                      <Avatar
+                        src={currentUser?.photoURL || `https://ui-avatars.com/api/?name=${currentUser?.displayName || "User"}&background=0D8ABC&color=fff&size=128`}
+                        alt={currentUser?.displayName || "User"}
+                        sx={{ width: 80, height: 80 }}
+                        className="border-4 border-white shadow-lg"
+                      />
+                    </div>
+                    <Typography variant="h6" className="font-bold mb-1">
+                      {currentUser?.displayName || "AeroLeaf User"}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" className="mb-4">
+                      {currentUser?.email}
+                    </Typography>
+                    <Typography variant="body2" className="mb-6 text-gray-600">
+                      Manage your personal information, security settings, and account preferences in your dedicated profile page.
+                    </Typography>
+                    <Button
+                      component={Link}
+                      to="/profile"
+                      variant="contained"
+                      startIcon={<Edit />}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white normal-case"
+                      fullWidth
+                    >
+                      View & Edit Profile
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </Grid>
