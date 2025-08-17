@@ -146,7 +146,7 @@ class ApiService {
     });
   }
 
-  async deleteAccount() {
+  async deleteUserAccount() {
     return this.request("/api/auth/delete-account", {
       method: "DELETE",
     });

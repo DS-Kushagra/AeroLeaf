@@ -31,7 +31,7 @@ export default function Settings() {
       setDeleteLoading(true);
       setError("");
 
-      await apiService.deleteAccount();
+      await apiService.deleteUserAccount();
 
       // Sign out user after successful deletion
       await signOut();
