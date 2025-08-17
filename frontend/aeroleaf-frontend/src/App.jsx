@@ -4,13 +4,14 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./styles/theme";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import StatusBanner from "./components/StatusBanner";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Marketplace from "./pages/Marketplace";
 import Analytics from "./pages/Analytics";
 import Report from "./pages/Report";
 import Login from "./pages/Login";
+import UserProfile from "./components/UserProfile";
+import ProjectDetails from "./pages/ProjectDetails";
 import SiteDetails from "./pages/SiteDetails";
 import ReviewSites from "./pages/ReviewSites";
 import { HelpProvider } from "./contexts/HelpContext";
@@ -28,16 +29,17 @@ function App() {
           <HelpProvider>
             <Router>
               <div className="flex flex-col min-h-screen">
-                <StatusBanner />
                 <Navbar />
                 <main className="flex-grow">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/project/:id" element={<ProjectDetails />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/report" element={<Report />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/profile" element={<UserProfile />} />
                     <Route path="/site/:id" element={<SiteDetails />} />
                     <Route path="/review" element={<ReviewSites />} />
                   </Routes>
