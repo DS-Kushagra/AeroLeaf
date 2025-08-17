@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import GoogleSignInButton from "../components/GoogleSignInButton";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,11 +13,11 @@ export default function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
-  const { signIn, signUp, resetPassword, clearError, currentUser } = useAuth();
+  const { signIn, signUp, resetPassword, clearError, currentUser, signInWithGoogle } = useAuth();
 
   // Animation and transition effect
   const [animate, setAnimate] = useState(false);
@@ -145,7 +147,7 @@ export default function Login() {
   };
 
   const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -261,12 +263,27 @@ export default function Login() {
       </div>
 
       {/* Right panel with form */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-white">
-        <div className="w-full max-w-md space-y-8">
-          <div>
+      <motion.div 
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex-1 flex items-center justify-center p-6 bg-white relative"
+      >
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: `radial-gradient(#22c55e 1px, transparent 1px)`,
+          backgroundSize: '30px 30px'
+        }}></div>
+        
+        <div className="w-full max-w-md space-y-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
             <div className="flex justify-center lg:hidden mb-8">
               <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center shadow-lg pulse-animation">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center shadow-lg pulse-animation transform transition-transform hover:scale-110">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 text-white"
@@ -282,7 +299,7 @@ export default function Login() {
                     />
                   </svg>
                 </div>
-                <span className="text-2xl font-bold text-green-600 tracking-tight">
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-800 tracking-tight">
                   AeroLeaf
                 </span>
               </div>
@@ -301,11 +318,13 @@ export default function Login() {
                 {isLogin ? "Sign up" : "Sign in"}
               </button>
             </p>
-          </div>
+          </motion.div>
 
           {error && (
-            <div
-              className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center fade-in"
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md flex items-center fade-in shadow-sm"
               role="alert"
             >
               <svg
@@ -322,12 +341,14 @@ export default function Login() {
                 />
               </svg>
               <p>{error}</p>
-            </div>
+            </motion.div>
           )}
 
           {success && (
-            <div
-              className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-md flex items-center fade-in"
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-md flex items-center fade-in shadow-sm"
               role="alert"
             >
               <svg
@@ -344,10 +365,13 @@ export default function Login() {
                 />
               </svg>
               <p>{success}</p>
-            </div>
+            </motion.div>
           )}
 
-          <form
+          <motion.form 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
             className={`mt-8 space-y-6 transition-all duration-300 transform ${
               animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
@@ -355,14 +379,19 @@ export default function Login() {
           >
             <div className="space-y-4">
               {!isLogin && (
-                <div className="form-field">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.4 }}
+                  className="form-field"
+                >
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Full Name
                   </label>
-                  <div className="mt-1 relative">
+                  <div className="relative rounded-md shadow-sm">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -386,21 +415,26 @@ export default function Login() {
                       autoComplete="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-400 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 transition-all sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-white hover:bg-gray-50 focus:bg-white sm:text-sm"
                       placeholder="John Doe"
                     />
                   </div>
-                </div>
+                </motion.div>
               )}
 
-              <div className="form-field">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.4 }}
+                className="form-field"
+              >
                 <label
                   htmlFor="email-address"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Email address
                 </label>
-                <div className="mt-1 relative">
+                <div className="relative rounded-md shadow-sm">
                   <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -425,20 +459,25 @@ export default function Login() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-400 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 transition-all sm:text-sm"
+                    className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-white hover:bg-gray-50 focus:bg-white sm:text-sm"
                     placeholder="you@example.com"
                   />
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="form-field">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.4 }}
+                className="form-field"
+              >
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Password
                 </label>
-                <div className="mt-1 relative">
+                <div className="relative rounded-md shadow-sm">
                   <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -458,12 +497,12 @@ export default function Login() {
                   <input
                     id="password"
                     name="password"
-                    type={passwordVisible ? "text" : "password"}
+                    type={showPassword ? "text" : "password"}
                     autoComplete={isLogin ? "current-password" : "new-password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 transition-all sm:text-sm"
+                    className="appearance-none block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-white hover:bg-gray-50 focus:bg-white sm:text-sm"
                     placeholder={
                       isLogin ? "Your password" : "Create a password"
                     }
@@ -473,7 +512,7 @@ export default function Login() {
                     onClick={togglePasswordVisibility}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    {passwordVisible ? (
+                    {showPassword ? (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5"
@@ -513,14 +552,24 @@ export default function Login() {
                   </button>
                 </div>
                 {!isLogin && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Password should be at least 8 characters long
-                  </p>
+                  <motion.p 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ delay: 0.8, duration: 0.3 }}
+                    className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded-md border border-gray-200"
+                  >
+                    Password should be at least 8 characters long with uppercase, lowercase, number and special character
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
 
               {!isLogin && (
-                <div className="form-field">
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.4 }}
+                  className="form-field"
+                >
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Account Type
                   </label>
@@ -530,7 +579,7 @@ export default function Login() {
                         role === "investor"
                           ? "border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200"
                           : "border-gray-300 text-gray-700"
-                      } px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all`}
+                      } px-3 py-3 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all duration-200 shadow-sm`}
                       onClick={() => setRole("investor")}
                     >
                       <span className="flex items-center">
@@ -557,7 +606,7 @@ export default function Login() {
                         role === "landowner"
                           ? "border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200"
                           : "border-gray-300 text-gray-700"
-                      } px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all`}
+                      } px-3 py-3 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all duration-200 shadow-sm`}
                       onClick={() => setRole("landowner")}
                     >
                       <span className="flex items-center">
@@ -584,7 +633,7 @@ export default function Login() {
                         role === "verifier"
                           ? "border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200"
                           : "border-gray-300 text-gray-700"
-                      } px-3 py-2 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all`}
+                      } px-3 py-3 text-sm font-medium cursor-pointer hover:bg-gray-50 transition-all duration-200 shadow-sm`}
                       onClick={() => setRole("verifier")}
                     >
                       <span className="flex items-center">
@@ -607,11 +656,16 @@ export default function Login() {
                       </span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>{" "}
             {isLogin && (
-              <div className="flex items-center justify-between">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.4 }}
+                className="flex items-center justify-between"
+              >
                 <div className="flex items-center">
                   <input
                     id="remember-me"
@@ -639,13 +693,17 @@ export default function Login() {
                     Forgot your password?
                   </button>
                 </div>
-              </div>
+              </motion.div>
             )}{" "}
-            <div>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.4 }}
+            >
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
               >
                 {loading ? (
                   <svg
@@ -671,8 +729,63 @@ export default function Login() {
                 ) : null}
                 {isLogin ? "Sign in" : "Create account"}
               </button>
-            </div>
-            <div className="text-center text-sm mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.0, duration: 0.4 }}
+                className="mt-4 relative"
+              >
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.1, duration: 0.4 }}
+                className="mt-4"
+              >
+                <GoogleSignInButton
+                  onClick={async () => {
+                    try {
+                      setError("");
+                      setLoading(true);
+                      const result = await signInWithGoogle();
+                      setSuccess(
+                        "Google sign-in successful! Redirecting to dashboard..."
+                      );
+
+                      setTimeout(() => {
+                        navigate("/dashboard");
+                      }, 1000);
+                    } catch (error) {
+                      console.error("Google authentication error:", error);
+                      setError(
+                        error.message ||
+                          "An error occurred with Google sign-in. Please try again."
+                      );
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  className="w-full"
+                />
+              </motion.div>
+            </motion.div>
+             <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2, duration: 0.4 }}
+              className="text-center text-sm mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm"
+            >
               <p className="text-gray-600 font-medium mb-1">
                 For demo purposes, you can:
               </p>
@@ -680,10 +793,10 @@ export default function Login() {
                 <p>• Create a new account with any email</p>
                 <p>• Use real Firebase authentication</p>
               </div>
-            </div>
-          </form>
+            </motion.div>
+          </motion.form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

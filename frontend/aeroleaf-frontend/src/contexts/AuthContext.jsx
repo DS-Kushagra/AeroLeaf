@@ -54,6 +54,21 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  
+  const signInWithGoogle = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      const result = await authService.signInWithGoogle();
+      return result;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signUp = async (email, password, displayName, role) => {
     try {
@@ -103,11 +118,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const deleteAccount = async (password) => {
+  const deleteUserAccount = async (password) => {
     try {
       setError(null);
       setLoading(true);
-      await authService.deleteAccount(password);
+      await authService.deleteUserAccount(password);
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const updateUserProfile = async (displayName, photoURL) => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      // This would call a method in authService to update the profile
+      // For now, we'll just simulate it
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // In a real implementation, you would update the user profile in Firebase
+      // await updateProfile(auth.currentUser, { displayName, photoURL });
+      
+      return { success: true };
     } catch (error) {
       setError(error.message);
       throw error;
@@ -125,11 +161,13 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     resetPassword,
     getCurrentToken,
-    deleteAccount,
+    deleteUserAccount,
+    updateUserProfile,
     clearError,
     isAuthenticated: !!currentUser,
   };
